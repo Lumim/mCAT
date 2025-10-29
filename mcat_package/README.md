@@ -160,8 +160,8 @@ You are free to reuse the architecture and components for research and education
 scss
 Copy code
 © 2025 Technical University of Denmark (DTU)
-Developed by [Your Name]
-Supervisors: [Supervisor Name(s)]
+Developed by [Mohammad Lummim Sarker]
+Supervisors: [Jakob E. Bardram]
 💬 Acknowledgments
 CARP Research Platform for architectural inspiration
 
