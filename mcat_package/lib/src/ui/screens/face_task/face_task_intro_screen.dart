@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/step_indicator.dart';
 import '../../widgets/header_bar.dart';
@@ -13,6 +14,38 @@ class FaceTaskIntroScreen extends StatefulWidget {
 
 class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
   bool _showSecond = false;
+
+  AudioPlayer? _player; // ✅ make it nullable
+  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer(); // safe initialization
+  }
+
+  Future<void> _togglePlay() async {
+    // ✅ guard: if player not ready yet, create one
+    _player ??= AudioPlayer();
+
+    if (_isPlaying) {
+      await _player!.pause();
+      setState(() => _isPlaying = false);
+    } else {
+      await _player!.play(AssetSource('sounds/face_1.mp3'));
+      setState(() => _isPlaying = true);
+
+      _player!.onPlayerComplete.listen((_) {
+        if (mounted) setState(() => _isPlaying = false);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _player?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +62,6 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
       ),
     );
   }
-  
 
   Widget _buildFirstScreen(BuildContext context, {Key? key}) {
     return Padding(
@@ -92,13 +124,15 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
           ),
           const SizedBox(height: 24),
           TextButton.icon(
-            onPressed: () {
-              // TODO: add play audio logic later
-            },
-            icon: const Icon(Icons.play_circle_fill, color: Colors.blue),
-            label: const Text(
-              'Hear instructions',
-              style: TextStyle(
+            onPressed: _togglePlay,
+            icon: Icon(
+              _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 28,
+            ),
+            label: Text(
+              _isPlaying ? 'Pause audio' : 'Hear instructions',
+              style: const TextStyle(
                 color: Colors.blue,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
