@@ -17,6 +17,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  
 
 flutter:
   uses-material-design: true
@@ -25,3 +26,4 @@ flutter:
     - assets/images/face_2.png
     - assets/images/logo.png
     - assets/images/carp_logo.png
+    - assets/sounds/face_1.mp3

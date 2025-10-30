@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// Ensure the package is added in pubspec.yaml and run flutter pub get
 import 'package:mcat_package/mcat_package.dart';
 import './route.dart';
 
@@ -18,6 +17,21 @@ class _McatAppState extends State<McatApp> {
   int _lastScore = 0;
   int _lastTotal = 0;
 
+  // ✅ Word list for Word Task
+  final List<String> wordList = const [
+    'mountains',
+    'city',
+    'snowman',
+    'coffee',
+    'airport',
+    'book',
+    'cartoon',
+    'sky',
+    'garden',
+    'house',
+    'sky',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final tasks = [
@@ -29,7 +43,7 @@ class _McatAppState extends State<McatApp> {
       title: 'mCAT',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
 
-      // ✅ Define home inside MaterialApp instead of using a route that depends on outer context
+      // ✅ Safe Builder context under MaterialApp
       home: Builder(
         builder: (navContext) => IntroScreen(
           tasks: tasks,
@@ -41,6 +55,7 @@ class _McatAppState extends State<McatApp> {
 
       onGenerateRoute: (settings) {
         switch (settings.name) {
+          // 🧠 ---------------- FACE TASK FLOW ----------------
           case AppRoutes.faceIntro:
             return MaterialPageRoute(
               builder: (context) => FaceTaskIntroScreen(
@@ -67,8 +82,8 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => FaceTaskAssessmentScreen(
                 items: [
-                  FaceItem('assets/images/face_1.png', Emotion.happy),
-                  FaceItem('assets/images/face_2.png', Emotion.sad),
+                  FaceItem('assets/images/face_1.png', Emotion.neutral),
+                  FaceItem('assets/images/face_2.png', Emotion.happy),
                 ],
                 onFinished: (score, total) {
                   _lastScore = score;
@@ -83,17 +98,62 @@ class _McatAppState extends State<McatApp> {
               builder: (context) => FaceTaskResultScreen(
                 score: _lastScore,
                 total: _lastTotal,
+                // ✅ Automatically go to Word Task Intro after “Next”
                 onNext: () {
+                  Navigator.of(context).pushNamed(AppRoutes.wordIntro);
+                },
+              ),
+            );
+
+          // 🗣 ---------------- WORD TASK FLOW ----------------
+          case AppRoutes.wordIntro:
+            return MaterialPageRoute(
+              builder: (context) => WordTaskIntroScreen(
+                onNext: () {
+                  Navigator.of(context).pushNamed(AppRoutes.wordPractice);
+                },
+              ),
+            );
+
+          case AppRoutes.wordPractice:
+            return MaterialPageRoute(
+              builder: (context) => WordTaskPracticeScreen(
+                words: ['coffee', 'book', 'sky'],
+                onFinished: (score, total) {
+                  Navigator.of(context).pushNamed(AppRoutes.wordAssessment);
+                },
+              ),
+            );
+
+          case AppRoutes.wordAssessment:
+            return MaterialPageRoute(
+              builder: (context) => WordTaskAssessmentScreen(
+                words: wordList,
+                onFinished: (score, total) {
+                  _lastScore = score;
+                  _lastTotal = total;
+                  Navigator.of(context).pushNamed(AppRoutes.wordResult);
+                },
+              ),
+            );
+
+          case AppRoutes.wordResult:
+            return MaterialPageRoute(
+              builder: (context) => WordTaskResultScreen(
+                score: _lastScore,
+                total: _lastTotal,
+                onNext: () {
+                  // ✅ Go back to the start or show a summary later
                   Navigator.of(context).popUntil((r) => r.isFirst);
                 },
               ),
             );
 
+          // 🚨 Unknown route fallback
           default:
             return MaterialPageRoute(
-              builder: (_) => const Scaffold(
-                body: Center(child: Text('Unknown route')),
-              ),
+              builder: (_) =>
+                  const Scaffold(body: Center(child: Text('Unknown route'))),
             );
         }
       },

@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 
 
 class AppRoutes {
-static const intro = '/';
-static const faceIntro = '/face/intro';
-static const facePractice = '/face/practice';
-static const faceAssessment = '/face/assessment';
-static const faceResult = '/face/result';
+  // Face Task
+  static const faceIntro = '/face_intro';
+  static const facePractice = '/face_practice';
+  static const faceAssessment = '/face_assessment';
+  static const faceResult = '/face_result';
+
+  // Word Task
+  static const wordIntro = '/word_intro';
+  static const wordPractice = '/word_practice';
+  static const wordAssessment = '/word_assessment';
+  static const wordResult = '/word_result';
 }
+
 
 
 class RouteArgs {

@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import '../../../domain/models/emotion.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/header_bar.dart';
+import '../../widgets/emotion_selector.dart';
 
+/// Represents a single face image and its correct emotion.
 class FaceItem {
   final String asset;
   final Emotion correct;
   FaceItem(this.asset, this.correct);
 }
 
+/// Assessment screen showing each face, then emotion options for scoring.
 class FaceTaskAssessmentScreen extends StatefulWidget {
   final List<FaceItem> items;
   final void Function(int score, int total) onFinished;
@@ -66,12 +69,20 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
     if (!showImage && selected == null) {
       selected = e;
       final current = widget.items[index];
-      if (selected == current.correct) score++;
+
+      // ✅ Scoring logic
+      if (selected == current.correct) {
+        score++;
+      }
+
+      // For debugging (optional)
+      debugPrint(
+          'Face ${index + 1}: selected=$selected | correct=${current.correct} | score=$score');
 
       if (index < widget.items.length - 1) {
-        Future.delayed(const Duration(milliseconds: 100), _next);
+        Future.delayed(const Duration(milliseconds: 500), _next);
       } else {
-        Future.delayed(const Duration(milliseconds: 100), () {
+        Future.delayed(const Duration(milliseconds: 500), () {
           widget.onFinished(score, widget.items.length);
         });
       }
@@ -91,20 +102,29 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
     final current = widget.items[index];
 
     return Scaffold(
-      appBar: HeaderBar(title: 'Face Task - Assessment', activeStep: 1),
+      backgroundColor: const Color(0xFFF5F6FB),
+      appBar: HeaderBar(title: 'Face Task – Assessment', activeStep: 1),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Text(
-              'Look at the face for 3 seconds, then select the emotion you saw.',
-              textAlign: TextAlign.center,
-            ),
+            showImage
+                ? const Text(
+                    'Look at the face for 3 seconds, then select the emotion you saw.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  )
+                : const Text(
+                    'Select the emotion below:',
+                    textAlign: TextAlign.center,
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
             const SizedBox(height: 12),
             Expanded(
               child: Center(
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 100),
+                  duration: const Duration(milliseconds: 300),
                   child: showImage
                       ? Column(
                           key: ValueKey('img_$index'),
@@ -115,7 +135,7 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
                                 fit: BoxFit.contain,
                               ),
                             ),
-                            //const SizedBox(height: 2),
+                            const SizedBox(height: 8),
                             AnimatedBuilder(
                               animation: _progressController,
                               builder: (context, child) {
@@ -125,9 +145,8 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
                                   alignment: Alignment.centerLeft,
                                   child: Container(
                                     height: 6,
-                                    width:
-                                        MediaQuery.of(context).size.width *
-                                            progress,
+                                    width: MediaQuery.of(context).size.width *
+                                        progress,
                                     decoration: BoxDecoration(
                                       color: Colors.blue,
                                       borderRadius: BorderRadius.circular(3),
@@ -138,29 +157,10 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
                             ),
                           ],
                         )
-                      : Column(
-                          key: const ValueKey('options'),
-                          children: [
-                            const Text(
-                              'Select the emotion below:',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              alignment: WrapAlignment.center,
-                              children: Emotion.values.map((e) {
-                                final isSelected = selected == e;
-                                return ChoiceChip(
-                                  label: Text(e.label),
-                                  selected: isSelected,
-                                  onSelected: (_) => _selectEmotion(e),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
+                      : EmotionSelector(
+          selected: selected,
+          onSelect: (e) => _selectEmotion(e),
+        ),
                 ),
               ),
             ),
@@ -181,4 +181,5 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
       ),
     );
   }
+
 }
