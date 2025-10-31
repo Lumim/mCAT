@@ -3,16 +3,20 @@ import 'package:flutter/material.dart';
 
 class AppRoutes {
   // Face Task
-  static const faceIntro = '/face_intro';
-  static const facePractice = '/face_practice';
-  static const faceAssessment = '/face_assessment';
-  static const faceResult = '/face_result';
-
-  // Word Task
+ static const faceIntro = '/face_intro';
   static const wordIntro = '/word_intro';
   static const wordPractice = '/word_practice';
   static const wordAssessment = '/word_assessment';
   static const wordResult = '/word_result';
+  static const facePractice = '/face_practice';
+  static const faceAssessment = '/face_assessment';
+  static const faceResult = '/face_result'; 
+
+  // Word Task
+  /* static const wordIntro = '/word_intro';
+  static const wordPractice = '/word_practice';
+  static const wordAssessment = '/word_assessment';
+  static const wordResult = '/word_result'; */
 }
 
 

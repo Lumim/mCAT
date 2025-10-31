@@ -13,6 +13,24 @@ dependencies:
   audioplayers: ^6.1.0
   speech_to_text: ^7.0.0
   flutter_tts: ^3.8.3
+  permission_handler: ^11.3.0
+  path_provider: ^2.0.15
+  cupertino_icons: ^1.0.8
+  collection: ^1.17.0
+  async: ^2.11.0
+  http: ^1.1.0
+  intl: ^0.18.0
+  shared_preferences: ^2.1.1
+  package_info_plus: ^4.0.0
+  device_info_plus: ^9.0.0
+  logger: ^1.2.2
+  uuid: ^4.3.0
+  csv: ^5.0.0
+  archive: ^3.3.7
+  dio: ^5.1.2
+  retry: ^3.1.0
+  animate_do: ^3.3.4
+  whisper_flutter_new: ^1.0.1
 
 dev_dependencies:
   flutter_test:

@@ -48,7 +48,7 @@ class _McatAppState extends State<McatApp> {
         builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () {
-            Navigator.of(navContext).pushNamed(AppRoutes.faceIntro);
+            Navigator.of(navContext).pushNamed(AppRoutes.wordAssessment);
           },
         ),
       ),
@@ -56,7 +56,7 @@ class _McatAppState extends State<McatApp> {
       onGenerateRoute: (settings) {
         switch (settings.name) {
           // 🧠 ---------------- FACE TASK FLOW ----------------
-          case AppRoutes.faceIntro:
+         /*  case AppRoutes.faceIntro:
             return MaterialPageRoute(
               builder: (context) => FaceTaskIntroScreen(
                 onNext: () {
@@ -124,7 +124,7 @@ class _McatAppState extends State<McatApp> {
                 },
               ),
             );
-
+ */
           case AppRoutes.wordAssessment:
             return MaterialPageRoute(
               builder: (context) => WordTaskAssessmentScreen(

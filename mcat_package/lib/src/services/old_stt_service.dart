@@ -21,8 +21,8 @@ class SttService {
       localeId: 'en_US',
       partialResults: true,
       listenMode: stt.ListenMode.dictation, //  keeps mic open for pauses
-      listenFor: const Duration(seconds:40), //  total listening time
-      pauseFor: const Duration(seconds: 8),   // allow small pauses
+      listenFor: const Duration(seconds:30), //  total listening time
+      pauseFor: const Duration(seconds: 5),   // allow small pauses
     );
   }
 
