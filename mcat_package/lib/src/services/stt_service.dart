@@ -1,4 +1,4 @@
-/* import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class SttService {
   final stt.SpeechToText _speech = stt.SpeechToText();
@@ -21,8 +21,8 @@ class SttService {
       localeId: 'en_US',
       partialResults: true,
       listenMode: stt.ListenMode.dictation, //  keeps mic open for pauses
-      listenFor: const Duration(seconds:40), //  total listening time
-      pauseFor: const Duration(seconds: 8),   // allow small pauses
+      listenFor: const Duration(seconds: 40), //  total listening time
+      pauseFor: const Duration(seconds: 8), // allow small pauses
     );
   }
 
@@ -30,10 +30,9 @@ class SttService {
   void dispose() => _speech.stop();
 }
 
- */
 
 
-import 'package:whisper_flutter/whisper_flutter.dart';
+/* import 'package:whisper_flutter/whisper_flutter.dart';
 
 final whisper = WhisperFlutter.instance;
 
@@ -42,3 +41,4 @@ Future<void> transcribe() async {
   final text = await whisper.transcribe();
   print('🗣 Whisper recognized: $text');
 }
+ */

@@ -17,6 +17,9 @@ class _McatAppState extends State<McatApp> {
   int _lastScore = 0;
   int _lastTotal = 0;
 
+  late final LnController _lnController = LnController(
+    LetterNumberService.defaultRounds(),
+  );
   // ✅ Word list for Word Task
   final List<String> wordList = const [
     'mountains',
@@ -48,7 +51,7 @@ class _McatAppState extends State<McatApp> {
         builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () {
-            Navigator.of(navContext).pushNamed(AppRoutes.wordAssessment);
+            Navigator.of(navContext).pushNamed(AppRoutes.lnIntro);
           },
         ),
       ),
@@ -56,7 +59,7 @@ class _McatAppState extends State<McatApp> {
       onGenerateRoute: (settings) {
         switch (settings.name) {
           // 🧠 ---------------- FACE TASK FLOW ----------------
-         /*  case AppRoutes.faceIntro:
+          /*  case AppRoutes.faceIntro:
             return MaterialPageRoute(
               builder: (context) => FaceTaskIntroScreen(
                 onNext: () {
@@ -125,7 +128,8 @@ class _McatAppState extends State<McatApp> {
               ),
             );
  */
-          case AppRoutes.wordAssessment:
+
+          /*  case AppRoutes.wordAssessment:
             return MaterialPageRoute(
               builder: (context) => WordTaskAssessmentScreen(
                 words: wordList,
@@ -148,11 +152,93 @@ class _McatAppState extends State<McatApp> {
                 },
               ),
             );
+ */
+          case AppRoutes.lnIntro:
+            return MaterialPageRoute(
+              builder: (context) => LnIntroScreen(
+                onStart: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.lnInstruction),
+              ),
+            );
 
+          case AppRoutes.lnInstruction:
+            return MaterialPageRoute(
+              builder: (context) => LnInstructionScreen(
+                onNext: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.lnPlay, arguments: _lnController),
+              ),
+            );
+
+          case AppRoutes.lnPlay:
+            return MaterialPageRoute(
+              builder: (context) {
+                final ctrl =
+                    settings.arguments as LnController? ?? _lnController;
+                return LnPlayScreen(
+                  controller: ctrl,
+                  onNext: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.lnListen, arguments: ctrl),
+                );
+              },
+            );
+
+          case AppRoutes.lnListen:
+            return MaterialPageRoute(
+              builder: (context) {
+                final ctrl =
+                    settings.arguments as LnController? ?? _lnController;
+                return LnListenScreen(
+                  controller: ctrl,
+                  onDoneCounting: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.lnInput, arguments: ctrl),
+                );
+              },
+            );
+
+          case AppRoutes.lnInput:
+            return MaterialPageRoute(
+              builder: (context) {
+                final ctrl =
+                    settings.arguments as LnController? ?? _lnController;
+                return LnInputScreen(
+                  controller: ctrl,
+                  onRoundFinished: () {
+                    if (ctrl.isLast) {
+                      Navigator.of(
+                        context,
+                      ).pushNamed(AppRoutes.lnResult, arguments: ctrl);
+                    } else {
+                      ctrl.nextRound();
+                      Navigator.of(
+                        context,
+                      ).pushNamed(AppRoutes.lnPlay, arguments: ctrl);
+                    }
+                  },
+                );
+              },
+            );
+
+          case AppRoutes.lnResult:
+            return MaterialPageRoute(
+              builder: (context) {
+                final ctrl =
+                    settings.arguments as LnController? ?? _lnController;
+                return LnResultScreen(
+                  controller: ctrl,
+                  onNext: () {
+                    // e.g. go back to home or next task
+                    Navigator.of(context).popUntil((r) => r.isFirst);
+                  },
+                );
+              },
+            );
           // 🚨 Unknown route fallback
           default:
             return MaterialPageRoute(
-              builder: (_) =>
+              builder: (context) =>
                   const Scaffold(body: Center(child: Text('Unknown route'))),
             );
         }

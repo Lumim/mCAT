@@ -27,4 +27,3 @@ flutter:
     - assets/images/logo.png
     - assets/images/carp_logo.png
     - assets/sounds/face_1.mp3
-    - assets/models/ggml-base.en.bin
