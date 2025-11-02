@@ -119,3 +119,4 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lockexample/assets/models/ggml-base.en.bin
 example/assets/models/ggml-base.en.bin
 example/assets/models/*.bin
+example/assets/models/ggml-base.en.bin
