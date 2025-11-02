@@ -1,4 +1,4 @@
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+/* import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class SttService {
   final stt.SpeechToText _speech = stt.SpeechToText();
@@ -30,3 +30,15 @@ class SttService {
   void dispose() => _speech.stop();
 }
 
+ */
+
+
+import 'package:whisper_flutter/whisper_flutter.dart';
+
+final whisper = WhisperFlutter.instance;
+
+Future<void> transcribe() async {
+  await whisper.loadModel(); // first time only
+  final text = await whisper.transcribe();
+  print('🗣 Whisper recognized: $text');
+}
