@@ -104,19 +104,19 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
       backgroundColor: const Color(0xFFF5F6FB),
       appBar: const HeaderBar(title: 'Coding Task', activeStep: 5),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(4),
         child: Column(
           children: [
             _buildReferenceTable(),
             const Divider(thickness: 1),
             Text('Sequence ${index + 1}/$total • Time left: $remaining s',
                 style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             ScaleTransition(
               scale: _anim,
               child: _codeCard(current.code),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             SizedBox(
               width: 120,
               child: TextField(
@@ -150,7 +150,7 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w500),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: refCodes
@@ -166,7 +166,7 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
                             style: GoogleFonts.inconsolata(
                                 fontWeight: FontWeight.bold)),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(e.letter,
                           style: const TextStyle(fontWeight: FontWeight.w600)),
                     ],

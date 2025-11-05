@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/primary_button.dart';
-import '../../widgets/step_indicator.dart';
 import '../../../domain/models/letter_number_models.dart';
 
 class LnInputScreen extends StatefulWidget {

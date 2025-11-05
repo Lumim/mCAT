@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/primary_button.dart';
 import '../../../services/tts_service.dart';
-import '../../widgets/step_indicator.dart';
 
 class CodingIntroScreen extends StatefulWidget {
   final VoidCallback onNext;
@@ -37,7 +36,7 @@ class _CodingIntroScreenState extends State<CodingIntroScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const StepIndicator(activeIndex: 5),
+           // const StepIndicator(activeIndex: 5),
             const SizedBox(height: 20),
             const Text('Instructions',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),

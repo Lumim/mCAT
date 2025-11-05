@@ -4,15 +4,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:mcat_package/mcat_package.dart';
 import './route.dart';
+import 'package:mcat_package/src/services/data_service.dart';
+import 'package:mcat_package/src/domain/models/letter_number_models.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Initialize Hive (local storage)
+  // Initialize Hive (local storage)
   await Hive.initFlutter();
 
-  // ✅ Initialize Firebase (cloud sync)
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Initialize Firebase (cloud sync)
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Initialize DataService for autosync (Hive + Firebase)
   await DataService().init();
 
   runApp(const McatApp());
@@ -20,7 +26,6 @@ Future<void> main() async {
 
 class McatApp extends StatefulWidget {
   const McatApp({super.key});
-
   @override
   State<McatApp> createState() => _McatAppState();
 }
@@ -34,32 +39,32 @@ class _McatAppState extends State<McatApp> {
     final tasks = [
       McatTask(id: 'face', title: 'Face Task'),
       McatTask(id: 'word', title: 'Word Task'),
+      McatTask(id: 'letter-number', title: 'Letter-Number Task'),
       McatTask(id: 'coding', title: 'Coding Task'),
     ];
 
     return MaterialApp(
       title: 'mCAT',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
 
-      // ✅ Safe Builder context under MaterialApp
+      // Start at the intro screen
       home: Builder(
         builder: (navContext) => IntroScreen(
           tasks: tasks,
-          onStart: () {
-            Navigator.of(navContext).pushNamed(AppRoutes.finalMcatResult);
-          },
+          onStart: () =>
+              Navigator.of(navContext).pushNamed(AppRoutes.faceIntro),
         ),
       ),
 
       onGenerateRoute: (settings) {
         switch (settings.name) {
-          // 🧠 ---------------- FACE TASK FLOW ----------------
-          /*  case AppRoutes.faceIntro:
+          // ✅ FACE TASK FLOW
+          case AppRoutes.faceIntro:
             return MaterialPageRoute(
               builder: (context) => FaceTaskIntroScreen(
-                onNext: () {
-                  Navigator.of(context).pushNamed(AppRoutes.facePractice);
-                },
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.facePractice),
               ),
             );
 
@@ -70,9 +75,8 @@ class _McatAppState extends State<McatApp> {
                   'assets/images/face_1.png',
                   'assets/images/face_2.png',
                 ],
-                onPracticeDone: () {
-                  Navigator.of(context).pushNamed(AppRoutes.faceAssessment);
-                },
+                onPracticeDone: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.faceAssessment),
               ),
             );
 
@@ -80,13 +84,14 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => FaceTaskAssessmentScreen(
                 items: [
-                  FaceItem('assets/images/face_1.png', Emotion.neutral),
-                  FaceItem('assets/images/face_2.png', Emotion.happy),
+                  FaceItem('assets/images/face_1.png', Emotion.happy),
+                  FaceItem('assets/images/face_2.png', Emotion.sad),
                 ],
                 onFinished: (score, total) {
                   _lastScore = score;
                   _lastTotal = total;
-                  Navigator.of(context).pushNamed(AppRoutes.faceResult);
+                  Navigator.of(context)
+                      .pushNamed(AppRoutes.faceResult);
                 },
               ),
             );
@@ -96,42 +101,60 @@ class _McatAppState extends State<McatApp> {
               builder: (context) => FaceTaskResultScreen(
                 score: _lastScore,
                 total: _lastTotal,
-                // ✅ Automatically go to Word Task Intro after “Next”
-                onNext: () {
-                  Navigator.of(context).pushNamed(AppRoutes.wordIntro);
-                },
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.wordIntro),
               ),
             );
 
-          // 🗣 ---------------- WORD TASK FLOW ----------------
+          // ✅ WORD TASK FLOW
           case AppRoutes.wordIntro:
             return MaterialPageRoute(
               builder: (context) => WordTaskIntroScreen(
-                onNext: () {
-                  Navigator.of(context).pushNamed(AppRoutes.wordPractice);
-                },
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.wordPractice),
               ),
             );
 
           case AppRoutes.wordPractice:
             return MaterialPageRoute(
               builder: (context) => WordTaskPracticeScreen(
-                words: ['coffee', 'book', 'sky'],
-                onFinished: (score, total) {
-                  Navigator.of(context).pushNamed(AppRoutes.wordAssessment);
-                },
+                words: const [
+                  'mountain',
+                  'city',
+                  'snowman',
+                  'coffee',
+                  'airport',
+                  'book',
+                  'cartoon',
+                  'sky',
+                  'garden',
+                  'house'
+                ],
+                onFinished: (score, total) => Navigator.of(context)
+                    .pushNamed(AppRoutes.wordAssessment),
               ),
             );
- 
 
           case AppRoutes.wordAssessment:
             return MaterialPageRoute(
               builder: (context) => WordTaskAssessmentScreen(
-                words: wordList,
+                words: const [
+                  'mountain',
+                  'city',
+                  'snowman',
+                  'coffee',
+                  'airport',
+                  'book',
+                  'cartoon',
+                  'sky',
+                  'garden',
+                  'house'
+                ],
                 onFinished: (score, total) {
                   _lastScore = score;
                   _lastTotal = total;
-                  Navigator.of(context).pushNamed(AppRoutes.wordResult);
+                  Navigator.of(context)
+                      .pushNamed(AppRoutes.wordResult);
                 },
               ),
             );
@@ -141,141 +164,71 @@ class _McatAppState extends State<McatApp> {
               builder: (context) => WordTaskResultScreen(
                 score: _lastScore,
                 total: _lastTotal,
-                onNext: () {
-                  // ✅ Go back to the start or show a summary later
-                  Navigator.of(context).popUntil((r) => r.isFirst);
-                },
-              ),
-            );
-
-          case AppRoutes.lnIntro:
-            return MaterialPageRoute(
-              builder: (context) => LnIntroScreen(
-                onStart: () =>
+                onNext: () =>
                     Navigator.of(context).pushNamed(AppRoutes.lnInstruction),
               ),
             );
 
+          // ✅ LETTER-NUMBER TASK FLOW
           case AppRoutes.lnInstruction:
-            return MaterialPageRoute(
-              builder: (context) => LnInstructionScreen(
-                onNext: () => Navigator.of(
-                  context,
-                ).pushNamed(AppRoutes.lnPlay, arguments: _lnController),
-              ),
-            );
+  return MaterialPageRoute(
+    builder: (context) => LnInstructionScreen(
+      onNext: () {
+        // Create LnController with positional parameter
+        final rounds = [
+          LnRoundSpec(3, 1), // 3 letters, 1-digit number
+          LnRoundSpec(4, 2), // 4 letters, 2-digit number  
+          LnRoundSpec(5, 2), // 5 letters, 2-digit number
+        ];
+        final controller = LnController(rounds); // Positional argument
+        Navigator.of(context).pushNamed(
+          AppRoutes.lnPlay,
+          arguments: controller,
+        );
+      },
+    ),
+  );
 
           case AppRoutes.lnPlay:
+            final controller = settings.arguments as LnController?;
+            if (controller == null) {
+              // Fallback if no controller provided
+              return MaterialPageRoute(
+                builder: (context) => Scaffold(
+                  body: Center(child: Text('Error: No controller provided')),
+                ),
+              );
+            }
             return MaterialPageRoute(
-              builder: (context) {
-                final ctrl =
-                    settings.arguments as LnController? ?? _lnController;
-                return LnPlayScreen(
-                  controller: ctrl,
-                  onNext: () => Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.lnListen, arguments: ctrl),
-                );
-              },
-            );
-
-          case AppRoutes.lnListen:
-            return MaterialPageRoute(
-              builder: (context) {
-                final ctrl =
-                    settings.arguments as LnController? ?? _lnController;
-                return LnListenScreen(
-                  controller: ctrl,
-                  onDoneCounting: () => Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.lnInput, arguments: ctrl),
-                );
-              },
-            );
-
-          case AppRoutes.lnInput:
-            return MaterialPageRoute(
-              builder: (context) {
-                final ctrl =
-                    settings.arguments as LnController? ?? _lnController;
-                return LnInputScreen(
-                  controller: ctrl,
-                  onRoundFinished: () {
-                    if (ctrl.isLast) {
-                      Navigator.of(
-                        context,
-                      ).pushNamed(AppRoutes.lnResult, arguments: ctrl);
-                    } else {
-                      ctrl.nextRound();
-                      Navigator.of(
-                        context,
-                      ).pushNamed(AppRoutes.lnPlay, arguments: ctrl);
-                    }
-                  },
-                );
-              },
-            );
-
-          case AppRoutes.lnResult:
-            return MaterialPageRoute(
-              builder: (context) {
-                final ctrl =
-                    settings.arguments as LnController? ?? _lnController;
-                return LnResultScreen(
-                  controller: ctrl,
-                  onNext: () {
-                    // e.g. go back to home or next task
-                    Navigator.of(context).popUntil((r) => r.isFirst);
-                  },
-                );
-              },
-            );
-
-
-
-
-          // 📝 ---------------- WORD RECALL TASK FLOW ----------------
-
-          case AppRoutes.wordRecallIntro:
-            return MaterialPageRoute(
-              builder: (context) => WordRecallIntroScreen(
-                onNext: () => Navigator.of(
-                  context,
-                ).pushNamed(AppRoutes.wordRecallInstruction),
-              ),
-            );
-
-          case AppRoutes.wordRecallInstruction:
-            return MaterialPageRoute(
-              builder: (context) => WordRecallInstructionScreen(
-                onNext: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.wordRecallListen),
-              ),
-            );
-
-          case AppRoutes.wordRecallListen:
-            return MaterialPageRoute(
-              builder: (context) => WordRecallListeningScreen(
-                onFinished: (result) {
-                  Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.wordRecallResult, arguments: result);
+              builder: (context) => LnPlayScreen(
+                controller: controller,
+                // Use the correct parameter name based on the package
+                onNext: () {
+                  Navigator.of(context)
+                      .pushNamed(AppRoutes.lnResult, arguments: controller);
                 },
               ),
             );
 
-          case AppRoutes.wordRecallResult:
+          case AppRoutes.lnResult:
+            final controller = settings.arguments as LnController?;
+            if (controller == null) {
+              // Fallback if no controller provided
+              return MaterialPageRoute(
+                builder: (context) => Scaffold(
+                  body: Center(child: Text('Error: No controller provided')),
+                ),
+              );
+            }
             return MaterialPageRoute(
-              builder: (context) {
-                final result = settings.arguments as WordRecallResult;
-                return WordRecallResultScreen(
-                  result: result,
-                  onNext: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.codingIntro),
-                );
-              },
+              builder: (context) => LnResultScreen(
+                controller: controller,
+                onNext: () => Navigator.of(context)
+                    .pushNamed(AppRoutes.codingIntro),
+              ),
             );
 
+          // ✅ CODING TASK FLOW
           case AppRoutes.codingIntro:
             return MaterialPageRoute(
               builder: (context) => CodingIntroScreen(
@@ -295,23 +248,23 @@ class _McatAppState extends State<McatApp> {
           case AppRoutes.codingAssessment:
             return MaterialPageRoute(
               builder: (context) => CodingAssessmentScreen(
-                onFinish: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.finalMcatResult),
+                onFinish: () => Navigator.of(context)
+                    .pushNamed(AppRoutes.finalMcatResult),
               ),
             );
 
- */
-
+          // ✅ FINAL RESULT SCREEN
           case AppRoutes.finalMcatResult:
             return MaterialPageRoute(
               builder: (_) => const McatFinalResultScreen(),
             );
 
-          // 🚨 Unknown route fallback
+          // Fallback route
           default:
             return MaterialPageRoute(
-              builder: (context) =>
-                  const Scaffold(body: Center(child: Text('Unknown route'))),
+              builder: (_) => const Scaffold(
+                body: Center(child: Text('Unknown route')),
+              ),
             );
         }
       },

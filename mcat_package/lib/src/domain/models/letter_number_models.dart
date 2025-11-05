@@ -32,7 +32,7 @@ class LnController {
   int correct = 0;
   LetterNumberItem? current;
 
-  LnController(this.rounds);
+  LnController(this.rounds); // Remove the incorrect line below this
 
   bool get isFirst => roundIndex == 0;
   bool get isLast => roundIndex == rounds.length - 1;

@@ -68,27 +68,27 @@ class _CodingPracticeScreenState extends State<CodingPracticeScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Coding Task', activeStep: 5),
+      appBar: const HeaderBar(title: 'Coding Practice Task', activeStep: 5),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(4),
         child: Column(
           children: [
             _buildReferenceTable(),
             const Divider(thickness: 1),
+           
+            /* Text('Fill in the box with correct words',
+                style: const TextStyle(fontSize: 15)), */
             const SizedBox(height: 8),
-            Text('Fill in the box with correct words',
-                style: const TextStyle(fontSize: 15)),
-            const SizedBox(height: 8),
-            Text('Sequence ${index + 1}/${_sequence.length}',
+            Text('Sequence ${index + 1}${_sequence.length}',
                 style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             ScaleTransition(
               scale: _anim,
               child: _codeCard(current.code),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             _inputBox(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 6),
             Text(feedback, style: const TextStyle(fontSize: 15)),
           ],
         ),
@@ -112,7 +112,7 @@ class _CodingPracticeScreenState extends State<CodingPracticeScreen>
               .map((e) => Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black12),
                           borderRadius: BorderRadius.circular(6),
@@ -121,7 +121,7 @@ class _CodingPracticeScreenState extends State<CodingPracticeScreen>
                             style: GoogleFonts.inconsolata(
                                 fontWeight: FontWeight.bold)),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(e.letter,
                           style: const TextStyle(fontWeight: FontWeight.w600)),
                     ],
@@ -133,10 +133,10 @@ class _CodingPracticeScreenState extends State<CodingPracticeScreen>
   }
 
   Widget _codeCard(String code) => Card(
-        elevation: 3,
+        elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(10),
           child: Text(code,
               style: GoogleFonts.inconsolata(
                   fontSize: 34, fontWeight: FontWeight.bold)),

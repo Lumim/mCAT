@@ -1,13 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mcat_package/src/services/tts_service.dart';
 import 'package:mcat_package/src/services/stt_service.dart';
-import 'package:mcat_package/src/ui/widgets/voice_pulse.dart';
+import 'package:mcat_package/src/services/data_service.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/primary_button.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:async';
 
-/// Word Task Screen — plays all words sequentially and listens for all spoken words.
 class WordTaskPracticeScreen extends StatefulWidget {
   final List<String> words;
   final void Function(int score, int total) onFinished;
@@ -21,19 +19,20 @@ class WordTaskPracticeScreen extends StatefulWidget {
   });
 
   @override
-  State<WordTaskPracticeScreen> createState() => _WordTaskPracticeScreenState();
+  State<WordTaskPracticeScreen> createState() =>
+      _WordTaskPracticeScreenState();
 }
 
 class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
   final TtsService _tts = TtsService();
   final SttService _stt = SttService();
 
-  bool ready = false;
-  bool playing = false;
+  bool speaking = false;
   bool listening = false;
-
-  String recognizedText = '';
+  bool completed = false;
   int score = 0;
+  String recognizedText = '';
+  Stopwatch timer = Stopwatch();
 
   @override
   void initState() {
@@ -42,71 +41,65 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
   }
 
   Future<void> _initSpeech() async {
-    var status = await Permission.microphone.request();
-    if (status.isGranted) {
-      await _stt.init();
-      setState(() => ready = true);
-    } else {
-      print('❌ Microphone permission denied');
-    }
+    await _stt.init();
   }
 
-  /// 🎧 Plays all words sequentially with 1-second delay between them
   Future<void> _playAllWords() async {
-    if (playing) return;
-    setState(() => playing = true);
-
-    for (int i = 0; i < widget.words.length; i++) {
-      await _tts.speak(widget.words[i]);
+    if (speaking) return;
+    setState(() => speaking = true);
+    for (final word in widget.words) {
+      await _tts.speak(word);
       await Future.delayed(const Duration(seconds: 1));
     }
-
-    setState(() => playing = false);
+    setState(() => speaking = false);
   }
 
-  /// 🎤 Listens once and checks which words were correctly recognized
-  Future<void> _listenAndScoreAll() async {
-    if (!ready || listening) return;
+  Future<void> _startListening() async {
+    if (listening) return;
 
-    setState(() {
-      listening = true;
-      recognizedText = '';
+    recognizedText = '';
+    score = 0;
+    timer.start();
+    setState(() => listening = true);
+
+    await _stt.startListening(onResult: (result) {
+      setState(() => recognizedText = result);
     });
 
-    String transcript = '';
-    await _stt.startListening(
-      onResult: (res) {
-        transcript = res;
-        setState(() => recognizedText = res);
-      },
-    );
+    // allow 15 seconds max listening
+    await Future.delayed(const Duration(seconds: 15));
+    await _stopListening();
+  }
 
-    // listen for up to 10 seconds total
-    await Future.delayed(const Duration(seconds: 10));
-
+  Future<void> _stopListening() async {
     await _stt.stopListening();
-
+    timer.stop();
     setState(() => listening = false);
 
-    // process transcript
-    final spokenWords = transcript
+    // scoring
+    final spokenWords = recognizedText
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z\s]'), '')
         .split(RegExp(r'\s+'))
-        .where((e) => e.isNotEmpty)
+        .where((w) => w.isNotEmpty)
         .toList();
 
-    print('🗣 Recognized: $spokenWords');
-
-    final expected = widget.words.map((w) => w.toLowerCase()).toList();
-
-    // count matches (spoken words that appear in list)
-    int correct = 0;
-    for (final word in expected) {
-      if (spokenWords.contains(word)) correct++;
+    for (final w in widget.words) {
+      if (spokenWords.contains(w.toLowerCase())) score++;
     }
 
-    setState(() => score = correct);
+    await _saveResult();
+    setState(() => completed = true);
+  }
+
+  Future<void> _saveResult() async {
+    final total = widget.words.length;
+    await DataService().saveTask('word_task', {
+      'correct': score,
+      'total': total,
+      'accuracy': score / total,
+      'timeTakenMs': timer.elapsedMilliseconds,
+    });
   }
 
   @override
@@ -120,125 +113,116 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: HeaderBar(title: widget.title, activeStep: 3),
+      appBar: HeaderBar(title: widget.title, activeStep: 2),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox(height: 16),
             const Text(
-              'You will hear all the words one by one. Then repeat all of them aloud.',
+              'Listen carefully and repeat all the words you hear.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            const SizedBox(height: 32),
-
-            // Word list preview
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Word List Preview:',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 8,
-                    children: widget.words
-                        .map(
-                          (w) => Chip(
-                            label: Text(w),
-                            backgroundColor: Colors.indigo.shade50,
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 40),
-
-            listening
-                ? listening
-                      ? Column(
-                          children: const [
-                            VoicePulse(),
-                            SizedBox(height: 12),
-                            Text(
-                              'Listening... Say all the words clearly.',
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        )
-                      : Text(
-                          recognizedText.isEmpty
-                              ? 'Press Speak to start saying the words.'
-                              : 'You said:\n"$recognizedText"',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: recognizedText.isEmpty
-                                ? Colors.black87
-                                : Colors.indigo.shade700,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        )
-                : const Spacer(),
-
-            // 🎧 Play and 🎤 Speak buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: playing ? null : _playAllWords,
-                  icon: const Icon(Icons.volume_up),
-                  label: const Text('Play All Words'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: listening ? null : _listenAndScoreAll,
-                  icon: const Icon(Icons.mic),
-                  label: const Text('Speak'),
-                ),
-              ],
-            ),
-
             const SizedBox(height: 24),
-
-            // ✅ Show score and Finish button
-            if (recognizedText.isNotEmpty && !listening)
-              Column(
+            _buildWordCard(),
+            const SizedBox(height: 24),
+            _buildRecognitionArea(),
+            const Spacer(),
+            if (!completed)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Score: $score / ${widget.words.length}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
+                  ElevatedButton.icon(
+                    onPressed: speaking ? null : _playAllWords,
+                    icon: const Icon(Icons.volume_up),
+                    label: const Text('Play Words'),
                   ),
-                  const SizedBox(height: 6),
-                  PrimaryButton(
-                    label: 'Finish',
-                    onPressed: () =>
-                        widget.onFinished(score, widget.words.length),
+                  ElevatedButton.icon(
+                    onPressed: listening ? null : _startListening,
+                    icon: const Icon(Icons.mic),
+                    label: const Text('Speak'),
                   ),
                 ],
               ),
+            if (completed) ...[
+              const SizedBox(height: 16),
+              PrimaryButton(
+                label: 'Next',
+                onPressed: () => widget.onFinished(score, widget.words.length),
+              ),
+            ],
+            const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildWordCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3))
+        ],
+      ),
+      child: Column(
+        children: [
+          const Text('Word List',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            children: widget.words
+                .map((w) => Chip(
+                      label: Text(w),
+                      backgroundColor: Colors.indigo.shade100,
+                    ))
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecognitionArea() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3))
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            listening
+                ? '🎤 Listening...'
+                : completed
+                    ? '✅ You said ${recognizedText.isEmpty ? "(no words)" : recognizedText}'
+                    : 'Press Speak and say all the words',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              color: listening
+                  ? Colors.blue
+                  : completed
+                      ? Colors.green
+                      : Colors.black87,
+            ),
+          ),
+          if (listening) const SizedBox(height: 10),
+          if (listening)
+            const LinearProgressIndicator(minHeight: 4, color: Colors.blue),
+        ],
       ),
     );
   }

@@ -31,10 +31,10 @@ class HeaderBar extends StatelessWidget implements PreferredSizeWidget {
               height: 28,
               fit: BoxFit.contain,
             ),
-            const SizedBox(width: 148),
+            const SizedBox(width: 80),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(left: 38),
+                padding: const EdgeInsets.only(right: 8),
                 child: Text(
                   title,
                   style: const TextStyle(
