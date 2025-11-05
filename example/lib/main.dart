@@ -4,8 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:mcat_package/mcat_package.dart';
 import './route.dart';
-import 'package:mcat_package/src/services/data_service.dart';
-import 'package:mcat_package/src/domain/models/letter_number_models.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +12,7 @@ Future<void> main() async {
   await Hive.initFlutter();
 
   // Initialize Firebase (cloud sync)
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize DataService for autosync (Hive + Firebase)
   await DataService().init();
@@ -90,8 +86,7 @@ class _McatAppState extends State<McatApp> {
                 onFinished: (score, total) {
                   _lastScore = score;
                   _lastTotal = total;
-                  Navigator.of(context)
-                      .pushNamed(AppRoutes.faceResult);
+                  Navigator.of(context).pushNamed(AppRoutes.faceResult);
                 },
               ),
             );
@@ -128,10 +123,10 @@ class _McatAppState extends State<McatApp> {
                   'cartoon',
                   'sky',
                   'garden',
-                  'house'
+                  'house',
                 ],
-                onFinished: (score, total) => Navigator.of(context)
-                    .pushNamed(AppRoutes.wordAssessment),
+                onFinished: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.wordAssessment),
               ),
             );
 
@@ -148,13 +143,12 @@ class _McatAppState extends State<McatApp> {
                   'cartoon',
                   'sky',
                   'garden',
-                  'house'
+                  'house',
                 ],
                 onFinished: (score, total) {
                   _lastScore = score;
                   _lastTotal = total;
-                  Navigator.of(context)
-                      .pushNamed(AppRoutes.wordResult);
+                  Navigator.of(context).pushNamed(AppRoutes.wordResult);
                 },
               ),
             );
@@ -171,23 +165,24 @@ class _McatAppState extends State<McatApp> {
 
           // ✅ LETTER-NUMBER TASK FLOW
           case AppRoutes.lnInstruction:
-  return MaterialPageRoute(
-    builder: (context) => LnInstructionScreen(
-      onNext: () {
-        // Create LnController with positional parameter
-        final rounds = [
-          LnRoundSpec(3, 1), // 3 letters, 1-digit number
-          LnRoundSpec(4, 2), // 4 letters, 2-digit number  
-          LnRoundSpec(5, 2), // 5 letters, 2-digit number
-        ];
-        final controller = LnController(rounds); // Positional argument
-        Navigator.of(context).pushNamed(
-          AppRoutes.lnPlay,
-          arguments: controller,
-        );
-      },
-    ),
-  );
+            return MaterialPageRoute(
+              builder: (context) => LnInstructionScreen(
+                onNext: () {
+                  // Create LnController with positional parameter
+                  final rounds = [
+                    LnRound.generate(level: 1, digits: 1, letters: 3),
+                    LnRound.generate(level: 2, digits: 2, letters: 4),
+                    LnRound.generate(level: 3, digits: 2, letters: 5),
+                  ];
+                  final controller = LnController(
+                    rounds,
+                  ); // Positional argument
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.lnPlay, arguments: controller);
+                },
+              ),
+            );
 
           case AppRoutes.lnPlay:
             final controller = settings.arguments as LnController?;
@@ -204,8 +199,9 @@ class _McatAppState extends State<McatApp> {
                 controller: controller,
                 // Use the correct parameter name based on the package
                 onNext: () {
-                  Navigator.of(context)
-                      .pushNamed(AppRoutes.lnResult, arguments: controller);
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.lnResult, arguments: controller);
                 },
               ),
             );
@@ -223,8 +219,8 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => LnResultScreen(
                 controller: controller,
-                onNext: () => Navigator.of(context)
-                    .pushNamed(AppRoutes.codingIntro),
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.codingIntro),
               ),
             );
 
@@ -248,8 +244,8 @@ class _McatAppState extends State<McatApp> {
           case AppRoutes.codingAssessment:
             return MaterialPageRoute(
               builder: (context) => CodingAssessmentScreen(
-                onFinish: () => Navigator.of(context)
-                    .pushNamed(AppRoutes.finalMcatResult),
+                onFinish: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.finalMcatResult),
               ),
             );
 
@@ -262,9 +258,8 @@ class _McatAppState extends State<McatApp> {
           // Fallback route
           default:
             return MaterialPageRoute(
-              builder: (_) => const Scaffold(
-                body: Center(child: Text('Unknown route')),
-              ),
+              builder: (_) =>
+                  const Scaffold(body: Center(child: Text('Unknown route'))),
             );
         }
       },
