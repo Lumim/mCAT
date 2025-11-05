@@ -37,7 +37,7 @@ dependencies:
   connectivity_plus: ^6.0.3
   path_provider: ^2.1.2
   google_fonts: ^6.3.2
-  speech_to_text_ultra: ^0.0.3
+  speech_to_text: ^7.3.0
 
 
 dev_dependencies:

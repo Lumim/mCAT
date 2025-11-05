@@ -43,19 +43,27 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
     setState(() => speaking = false);
   }
 
-  Future<void> _startListening() async {
+  /// Start listening with continuous speech-to-text
+  Future<void> _start() async {
     setState(() => listening = true);
-    recognized = '';
 
     await _stt.startListening(
-      onResult: (text) => setState(() => recognized = text),
+      onPartialResult: (text) {
+        setState(() => recognized = text);
+      },
+      onFinalResult: (finalText) {
+        // Triggered when user pauses for a few seconds or stops manually
+        setState(() {
+          recognized = finalText;
+          listening = false;
+        });
+        debugPrint('🎤 Final recognized text: $finalText');
+      },
     );
-
-    await Future.delayed(const Duration(seconds: 10));
-    await _stopListening();
   }
 
-  Future<void> _stopListening() async {
+  /// Stop the listening session
+  Future<void> _stop() async {
     await _stt.stopListening();
     setState(() => listening = false);
   }
@@ -79,6 +87,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
             const Text(
               'Let’s practice. Listen and repeat these words.',
               textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 30),
             _micIndicator(),
@@ -87,6 +96,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
               listening
                   ? '🎤 Listening...'
                   : 'You said: ${recognized.isEmpty ? "(none)" : recognized}',
+              style: const TextStyle(fontSize: 16),
             ),
             const Spacer(),
             Row(
@@ -98,9 +108,9 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
                   onPressed: speaking ? null : _playWords,
                 ),
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.mic),
-                  label: const Text('Speak'),
-                  onPressed: listening ? null : _startListening,
+                  icon: Icon(listening ? Icons.stop : Icons.mic),
+                  label: Text(listening ? 'Stop' : 'Speak'),
+                  onPressed: listening ? _stop : _start,
                 ),
               ],
             ),
@@ -113,6 +123,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
     );
   }
 
+  /// Animated microphone indicator
   Widget _micIndicator() {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 400),

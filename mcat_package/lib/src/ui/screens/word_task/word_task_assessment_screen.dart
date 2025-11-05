@@ -51,22 +51,27 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
   }
 
   Future<void> _startListening() async {
-    if (listening) return;
     setState(() => listening = true);
-    recognized = '';
 
     await _stt.startListening(
-      onResult: (text) => setState(() => recognized = text),
+      onPartialResult: (text) {
+        setState(() => recognized = text);
+      },
+      onFinalResult: (finalText) {
+        // Triggered when user pauses for a few seconds or stops manually
+        setState(() {
+          recognized = finalText;
+          listening = false;
+        });
+        debugPrint('🎤 Final recognized text: $finalText');
+      },
     );
-
-    await Future.delayed(const Duration(seconds: 20));
-    await _stopListening();
   }
 
-  Future<void> _stopListening() async {
+  /// Stop the listening session
+  Future<void> _stop() async {
     await _stt.stopListening();
     setState(() => listening = false);
-    _evaluate();
   }
 
   void _evaluate() async {

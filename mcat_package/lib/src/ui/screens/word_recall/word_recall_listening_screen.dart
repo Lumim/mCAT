@@ -34,14 +34,27 @@ class _WordRecallListeningScreenState extends State<WordRecallListeningScreen> {
   }
 
   Future<void> _beginRecall() async {
-    await _stt.init();
     setState(() => listening = true);
 
     await _stt.startListening(
-      onResult: (text) => setState(() => recognized = text),
+      onPartialResult: (text) {
+        setState(() => recognized = text);
+      },
+      onFinalResult: (finalText) {
+        // Triggered when user pauses for a few seconds or stops manually
+        setState(() {
+          recognized = finalText;
+          listening = false;
+        });
+        debugPrint('🎤 Final recognized text: $finalText');
+      },
     );
-    await Future.delayed(const Duration(seconds: 20));
-    await _stopListening();
+  }
+
+  /// Stop the listening session
+  Future<void> _stop() async {
+    await _stt.stopListening();
+    setState(() => listening = false);
   }
 
   Future<void> _stopListening() async {
