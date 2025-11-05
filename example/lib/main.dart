@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:mcat_package/mcat_package.dart';
 import './route.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Initialize Hive (local storage)
+  await Hive.initFlutter();
+
+  // ✅ Initialize Firebase (cloud sync)
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await DataService().init();
+
   runApp(const McatApp());
 }
 
 class McatApp extends StatefulWidget {
   const McatApp({super.key});
+
   @override
   State<McatApp> createState() => _McatAppState();
 }
@@ -17,29 +29,12 @@ class _McatAppState extends State<McatApp> {
   int _lastScore = 0;
   int _lastTotal = 0;
 
-  late final LnController _lnController = LnController(
-    LetterNumberService.defaultRounds(),
-  );
-  // ✅ Word list for Word Task
-  final List<String> wordList = const [
-    'mountains',
-    'city',
-    'snowman',
-    'coffee',
-    'airport',
-    'book',
-    'cartoon',
-    'sky',
-    'garden',
-    'house',
-    'sky',
-  ];
-
   @override
   Widget build(BuildContext context) {
     final tasks = [
       McatTask(id: 'face', title: 'Face Task'),
       McatTask(id: 'word', title: 'Word Task'),
+      McatTask(id: 'coding', title: 'Coding Task'),
     ];
 
     return MaterialApp(
@@ -51,7 +46,7 @@ class _McatAppState extends State<McatApp> {
         builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () {
-            Navigator.of(navContext).pushNamed(AppRoutes.lnIntro);
+            Navigator.of(navContext).pushNamed(AppRoutes.finalMcatResult);
           },
         ),
       ),
@@ -127,9 +122,9 @@ class _McatAppState extends State<McatApp> {
                 },
               ),
             );
- */
+ 
 
-          /*  case AppRoutes.wordAssessment:
+          case AppRoutes.wordAssessment:
             return MaterialPageRoute(
               builder: (context) => WordTaskAssessmentScreen(
                 words: wordList,
@@ -152,7 +147,7 @@ class _McatAppState extends State<McatApp> {
                 },
               ),
             );
- */
+
           case AppRoutes.lnIntro:
             return MaterialPageRoute(
               builder: (context) => LnIntroScreen(
@@ -235,6 +230,83 @@ class _McatAppState extends State<McatApp> {
                 );
               },
             );
+
+
+
+
+          // 📝 ---------------- WORD RECALL TASK FLOW ----------------
+
+          case AppRoutes.wordRecallIntro:
+            return MaterialPageRoute(
+              builder: (context) => WordRecallIntroScreen(
+                onNext: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.wordRecallInstruction),
+              ),
+            );
+
+          case AppRoutes.wordRecallInstruction:
+            return MaterialPageRoute(
+              builder: (context) => WordRecallInstructionScreen(
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.wordRecallListen),
+              ),
+            );
+
+          case AppRoutes.wordRecallListen:
+            return MaterialPageRoute(
+              builder: (context) => WordRecallListeningScreen(
+                onFinished: (result) {
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.wordRecallResult, arguments: result);
+                },
+              ),
+            );
+
+          case AppRoutes.wordRecallResult:
+            return MaterialPageRoute(
+              builder: (context) {
+                final result = settings.arguments as WordRecallResult;
+                return WordRecallResultScreen(
+                  result: result,
+                  onNext: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.codingIntro),
+                );
+              },
+            );
+
+          case AppRoutes.codingIntro:
+            return MaterialPageRoute(
+              builder: (context) => CodingIntroScreen(
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.codingPractice),
+              ),
+            );
+
+          case AppRoutes.codingPractice:
+            return MaterialPageRoute(
+              builder: (context) => CodingPracticeScreen(
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.codingAssessment),
+              ),
+            );
+
+          case AppRoutes.codingAssessment:
+            return MaterialPageRoute(
+              builder: (context) => CodingAssessmentScreen(
+                onFinish: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.finalMcatResult),
+              ),
+            );
+
+ */
+
+          case AppRoutes.finalMcatResult:
+            return MaterialPageRoute(
+              builder: (_) => const McatFinalResultScreen(),
+            );
+
           // 🚨 Unknown route fallback
           default:
             return MaterialPageRoute(

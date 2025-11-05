@@ -31,26 +31,24 @@ class HeaderBar extends StatelessWidget implements PreferredSizeWidget {
               height: 28,
               fit: BoxFit.contain,
             ),
-             
             const SizedBox(width: 148),
             Expanded(
-              child: 
-              Padding(padding:const EdgeInsets.only(left: 38),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 38),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                overflow: TextOverflow.ellipsis,
-              ),),
+              ),
             ),
           ],
         ),
       ),
-      
       bottom: activeStep != null
           ? PreferredSize(
               preferredSize: const Size.fromHeight(40),
