@@ -11,7 +11,6 @@ dependencies:
   flutter:
     sdk: flutter
   audioplayers: ^5.2.1 
-  speech_to_text: ^7.0.1  # Correct version - 8.0.0 doesn't exist
   flutter_tts: ^3.8.3
   permission_handler: ^11.3.0
   cupertino_icons: ^1.0.8
@@ -38,6 +37,8 @@ dependencies:
   connectivity_plus: ^6.0.3
   path_provider: ^2.1.2
   google_fonts: ^6.3.2
+  speech_to_text_ultra: ^0.0.3
+
 
 dev_dependencies:
   flutter_test:

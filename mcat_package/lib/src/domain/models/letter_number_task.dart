@@ -1,4 +1,4 @@
-class LetterNumberItem {
+/* class LetterNumberItem {
   final List<String> letters;
   final int number;
 
@@ -18,4 +18,4 @@ class LetterNumberTask {
 }
 
 
-//unused file
+//unused file */

@@ -4,7 +4,6 @@ export 'src/domain/models/word_task.dart';
 export 'src/domain/models/letter_number_models.dart';
 export 'src/domain/models/word_recall_models.dart';
 export 'src/domain/models/coding_task_models.dart';
-export 'src/services/letter_number_service.dart';
 export 'src/services/data_service.dart';
 export 'src/services/connectivity_service.dart';
 export 'src/ui/screens/intro_screen.dart';

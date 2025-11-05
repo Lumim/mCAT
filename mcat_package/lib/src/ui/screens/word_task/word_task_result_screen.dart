@@ -18,7 +18,7 @@ class WordTaskResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Word Task', activeStep: 4),
+      appBar: const HeaderBar(title: 'Word Task', activeStep: 2),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

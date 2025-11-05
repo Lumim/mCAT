@@ -1,13 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../services/stt_service.dart';
-import '../../../services/word_recall_service.dart';
-import '../../../domain/models/word_recall_models.dart';
+import 'package:mcat_package/src/services/stt_service.dart';
+import 'package:mcat_package/src/services/data_service.dart';
 import '../../widgets/header_bar.dart';
+import '../../widgets/primary_button.dart';
 
 class WordRecallListeningScreen extends StatefulWidget {
-  final void Function(WordRecallResult result) onFinished;
-  const WordRecallListeningScreen({super.key, required this.onFinished});
+  final List<String> expectedWords;
+  final VoidCallback onFinished;
+
+  const WordRecallListeningScreen({
+    super.key,
+    required this.expectedWords,
+    required this.onFinished,
+  });
 
   @override
   State<WordRecallListeningScreen> createState() =>
@@ -15,48 +21,62 @@ class WordRecallListeningScreen extends StatefulWidget {
 }
 
 class _WordRecallListeningScreenState extends State<WordRecallListeningScreen> {
-  final _stt = SttService();
-  bool _listening = false;
-  String _recognized = '';
+  final SttService _stt = SttService();
+  String recognized = '';
+  bool listening = false;
   Timer? _timer;
+  int score = 0;
 
   @override
   void initState() {
     super.initState();
-    _startListening();
+    _beginRecall();
   }
 
-  Future<void> _startListening() async {
+  Future<void> _beginRecall() async {
     await _stt.init();
-    setState(() => _listening = true);
+    setState(() => listening = true);
 
-    _stt.startListening(onResult: (text) {
-      setState(() => _recognized = text);
+    await _stt.startListening(
+      onResult: (text) => setState(() => recognized = text),
+    );
+    await Future.delayed(const Duration(seconds: 20));
+    await _stopListening();
+  }
+
+  Future<void> _stopListening() async {
+    await _stt.stopListening();
+    setState(() => listening = false);
+    _calculateScore();
+
+    await DataService().saveTask('word_recall', {
+      'correct': score,
+      'total': widget.expectedWords.length,
+      'recognized': recognized,
+      'accuracy': score / widget.expectedWords.length,
+      'timestamp': DateTime.now().toIso8601String(),
     });
 
-    // Auto-stop after 12 seconds
-    _timer = Timer(const Duration(seconds: 12), _finish);
+    widget.onFinished();
   }
 
-  Future<void> _finish() async {
-    await _stt.stopListening();
-    setState(() => _listening = false);
+  void _calculateScore() {
+    final spokenWords = recognized
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z\s]'), '')
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
 
-    final spokenWords = WordRecallService.extractWords(_recognized);
-    final target = WordRecallService.getOriginalWordList();
-    final correct = WordRecallService.scoreRecall(spokenWords, target);
-
-    widget.onFinished(WordRecallResult(
-      recalledWords: spokenWords,
-      correctCount: correct,
-      total: target.length,
-    ));
+    for (final word in widget.expectedWords) {
+      if (spokenWords.contains(word.toLowerCase())) score++;
+    }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     _stt.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -64,52 +84,52 @@ class _WordRecallListeningScreenState extends State<WordRecallListeningScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Word Recall Task', activeStep: 4),
+      appBar: const HeaderBar(title: 'Word Recall', activeStep: 4),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const SizedBox(height: 16),
-            const Text('Now say the words you heard before.',
-                style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.mic,
-                    color: _listening ? Colors.blue : Colors.grey,
-                    size: 32,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    _listening ? 'Listening...' : 'Stopped',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
+            const Text(
+              'Say all the words you remember.',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
             ),
+            const SizedBox(height: 40),
+            _micIndicator(),
             const SizedBox(height: 16),
-            if (_recognized.isNotEmpty)
-              Text(
-                'Recognized: $_recognized',
-                textAlign: TextAlign.center,
-              ),
+            Text(
+              listening
+                  ? 'Listening...'
+                  : 'You said: ${recognized.isEmpty ? "(no words)" : recognized}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16),
+            ),
             const Spacer(),
-            if (!_listening)
-              ElevatedButton(
-                onPressed: _finish,
-                child: const Text('End'),
-              ),
+            if (!listening)
+              PrimaryButton(label: 'Continue', onPressed: widget.onFinished),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _micIndicator() {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      width: listening ? 90 : 70,
+      height: listening ? 90 : 70,
+      decoration: BoxDecoration(
+        color: listening ? Colors.green : Colors.grey,
+        shape: BoxShape.circle,
+        boxShadow: [
+          if (listening)
+            BoxShadow(
+              color: Colors.green.withOpacity(0.4),
+              blurRadius: 25,
+              spreadRadius: 12,
+            ),
+        ],
+      ),
+      child: const Icon(Icons.mic, color: Colors.white, size: 36),
     );
   }
 }

@@ -1,67 +1,74 @@
 import 'dart:math';
 
-/// One stimulus: N letters (A–Z) + one number with D digits.
-class LetterNumberItem {
-  final List<String> letters; // e.g. ['A','B','C']
-  final int number; // e.g. 29
+/// Represents one Letter–Number round
+class LnRound {
+  final int level;
+  final int digits;
+  final int letters;
+  final List<int> numberSeq;
+  final List<String> letterSeq;
 
-  const LetterNumberItem({required this.letters, required this.number});
+  LnRound({
+    required this.level,
+    required this.digits,
+    required this.letters,
+    required this.numberSeq,
+    required this.letterSeq,
+  });
 
-  /// Accept typed letters in any order (letters only, case-insensitive).
-  bool matchesInput(String input) {
-    final norm = input.toUpperCase().replaceAll(RegExp(r'[^A-Z]'), '');
-    final typed = norm.split('')..sort();
-    final target = [...letters]..sort();
-    return typed.join() == target.join();
+  factory LnRound.generate({
+    required int level,
+    required int digits,
+    required int letters,
+  }) {
+    final rand = Random();
+    final nums = List.generate(digits, (_) => rand.nextInt(9) + 1);
+    final lets = List.generate(
+      letters,
+      (_) => String.fromCharCode(rand.nextInt(26) + 65),
+    );
+    return LnRound(
+      level: level,
+      digits: digits,
+      letters: letters,
+      numberSeq: nums,
+      letterSeq: lets,
+    );
   }
 }
 
-/// Round specification: how many letters and how many digits for the number.
-class LnRoundSpec {
-  final int lettersCount;
-  final int digitsCount;
-  const LnRoundSpec(this.lettersCount, this.digitsCount);
-}
-
-/// Flow/state controller shared across screens in the task.
+/// Controls all Letter–Number rounds
 class LnController {
-  final List<LnRoundSpec> rounds;
-  final _rand = Random();
-
+  final List<LnRound> rounds;
   int roundIndex = 0;
   int correct = 0;
-  LetterNumberItem? current;
+  int total = 0;
 
-  LnController(this.rounds); // Remove the incorrect line below this
+  LnController(this.rounds);
 
-  bool get isFirst => roundIndex == 0;
-  bool get isLast => roundIndex == rounds.length - 1;
-
-  /// Generate a fresh item for the current round.
-  LetterNumberItem generate() {
-    final spec = rounds[roundIndex];
-    final letters = List.generate(
-      spec.lettersCount,
-      (_) => String.fromCharCode(_rand.nextInt(26) + 65),
-    );
-    final max = pow(10, spec.digitsCount).toInt();
-    final min = pow(10, spec.digitsCount - 1).toInt();
-    final number = spec.digitsCount == 1
-        ? _rand.nextInt(10)
-        : _rand.nextInt(max - min) + min;
-    current = LetterNumberItem(letters: letters, number: number);
-    return current!;
+  static List<LnRound> generateRounds() {
+    return [
+      LnRound.generate(level: 1, digits: 2, letters: 2),
+      LnRound.generate(level: 2, digits: 3, letters: 3),
+      LnRound.generate(level: 3, digits: 4, letters: 3),
+    ];
   }
 
-  /// Score typed letters; advance to next round if any.
-  void submitLetters(String typed) {
-    if (current == null) return;
-    if (current!.matchesInput(typed)) correct++;
-  }
+  LnRound? get current => (roundIndex >= 0 && roundIndex < rounds.length)
+      ? rounds[roundIndex]
+      : null;
+
+  bool get isLast => roundIndex >= rounds.length - 1;
 
   void nextRound() {
     if (!isLast) roundIndex++;
   }
 
-  int get total => rounds.length;
+  void addScore({required int correctThisRound, required int totalThisRound}) {
+    correct += correctThisRound;
+    total += totalThisRound;
+  }
+
+  /// Dummy placeholder so old references don’t break
+  void submitLetters(String text) {}
 }
