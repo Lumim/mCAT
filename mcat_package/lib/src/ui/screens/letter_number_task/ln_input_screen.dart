@@ -1,72 +1,75 @@
 import 'package:flutter/material.dart';
-import '../../widgets/header_bar.dart';
-import '../../widgets/primary_button.dart';
 import '../../../domain/models/letter_number_models.dart';
+import '../../widgets/header_bar.dart';
+import 'package:mcat_package/src/services/data_service.dart';
 
 class LnInputScreen extends StatefulWidget {
   final LnController controller;
-  final VoidCallback onRoundFinished; // next round or result
-  const LnInputScreen({
-    super.key,
-    required this.controller,
-    required this.onRoundFinished,
-  });
+  const LnInputScreen({super.key, required this.controller});
 
   @override
   State<LnInputScreen> createState() => _LnInputScreenState();
 }
 
 class _LnInputScreenState extends State<LnInputScreen> {
-  final _controller = TextEditingController();
+  final TextEditingController _ctrl = TextEditingController();
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
 
-  void _submit() {
-    widget.controller.submitLetters(_controller.text);
-    widget.onRoundFinished();
+  Future<void> _onContinue() async {
+    // Optional: persist per-round input
+    await DataService().saveTask('ln_input', {
+      'round': widget.controller.roundIndex + 1,
+      'value': _ctrl.text.trim(),
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
+    if (!widget.controller.isLast) {
+      // ➜ Advance to next round and go back to Play
+      widget.controller.nextRound();
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(
+        context,
+        '/ln-play', // hyphen route
+        arguments: widget.controller,
+      );
+    } else {
+      // ➜ Last round: go to Result
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(
+        context,
+        '/ln-result', // hyphen route
+        arguments: widget.controller,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final round = widget.controller.roundIndex + 1;
+    final roundNo = widget.controller.roundIndex + 1;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: HeaderBar(
-        title: 'Letter Number Task (Round $round)',
-        activeStep: 3,
-      ),
+      appBar: HeaderBar(title: 'LN – Input (Round $roundNo)', activeStep: 3),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const SizedBox(height: 24),
-            const Text(
-              'Now, please enter the letters in any order',
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: TextField(
-                  controller: _controller,
-                  textAlign: TextAlign.center,
-                  decoration: const InputDecoration(
-                    hintText: 'Tap and Type',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
+            const Text('Enter a starting number (optional):'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _ctrl,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(border: OutlineInputBorder()),
             ),
             const Spacer(),
-            PrimaryButton(label: 'Next', onPressed: _submit),
+            ElevatedButton(
+              onPressed: _onContinue,
+              child: const Text('Continue'),
+            ),
           ],
         ),
       ),

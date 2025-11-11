@@ -26,6 +26,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
   bool speaking = false;
   bool listening = false;
   String recognized = '';
+  List<String> recognizedWords = [];
 
   @override
   void initState() {
@@ -43,29 +44,41 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
     setState(() => speaking = false);
   }
 
-  /// Start listening with continuous speech-to-text
   Future<void> _start() async {
-    setState(() => listening = true);
+    setState(() {
+      listening = true;
+      recognized = '';
+      recognizedWords = [];
+    });
 
     await _stt.startListening(
       onPartialResult: (text) {
-        setState(() => recognized = text);
+        if (!mounted) return;
+        setState(() {
+          recognized = text;
+          recognizedWords = _splitWords(text);
+        });
       },
       onFinalResult: (finalText) {
-        // Triggered when user pauses for a few seconds or stops manually
+        if (!mounted) return;
         setState(() {
           recognized = finalText;
+          recognizedWords = _splitWords(finalText);
           listening = false;
         });
         debugPrint('🎤 Final recognized text: $finalText');
       },
+      durationSeconds: 20,
     );
   }
 
-  /// Stop the listening session
   Future<void> _stop() async {
     await _stt.stopListening();
-    setState(() => listening = false);
+    if (mounted) setState(() => listening = false);
+  }
+
+  List<String> _splitWords(String text) {
+    return text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
   }
 
   @override
@@ -94,10 +107,27 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
             const SizedBox(height: 16),
             Text(
               listening
-                  ? '🎤 Listening...'
-                  : 'You said: ${recognized.isEmpty ? "(none)" : recognized}',
+                  ? '🎤 Listening for 20 seconds...'
+                  : recognized.isEmpty
+                      ? 'You said: (none)'
+                      : 'You said:',
               style: const TextStyle(fontSize: 16),
             ),
+            const SizedBox(height: 10),
+            if (recognizedWords.isNotEmpty)
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
+                children: recognizedWords
+                    .map(
+                      (word) => Chip(
+                        label: Text(word),
+                        backgroundColor: Colors.blue.shade50,
+                      ),
+                    )
+                    .toList(),
+              ),
             const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -115,15 +145,17 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            if (!listening && recognized.isNotEmpty)
-              PrimaryButton(label: 'Continue', onPressed: widget.onFinished),
+            if (!listening && recognizedWords.isNotEmpty)
+              PrimaryButton(
+                label: 'Continue',
+                onPressed: widget.onFinished,
+              ),
           ],
         ),
       ),
     );
   }
 
-  /// Animated microphone indicator
   Widget _micIndicator() {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 400),

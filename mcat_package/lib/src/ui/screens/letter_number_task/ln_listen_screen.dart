@@ -7,13 +7,7 @@ import 'package:mcat_package/src/services/data_service.dart';
 
 class LnListenScreen extends StatefulWidget {
   final LnController controller;
-  final VoidCallback onDoneCounting;
-
-  const LnListenScreen({
-    super.key,
-    required this.controller,
-    required this.onDoneCounting,
-  });
+  const LnListenScreen({super.key, required this.controller});
 
   @override
   State<LnListenScreen> createState() => _LnListenScreenState();
@@ -23,63 +17,77 @@ class _LnListenScreenState extends State<LnListenScreen> {
   final SttService _stt = SttService();
   String recognized = '';
   bool listening = false;
-  Timer? _timer;
+  Timer? _safetyTimer;
 
   @override
   void initState() {
     super.initState();
-    _startListening();
+    _start();
   }
 
-  Future<void> _startListening() async {
-    setState(() => listening = true);
+  Future<void> _start() async {
+    await _stt.init();
+    setState(() {
+      listening = true;
+      recognized = '';
+    });
 
+    // 20s seamless capture; restarts internally if Android stops early.
     await _stt.startListening(
+      durationSeconds: 10,
       onPartialResult: (text) {
+        if (!mounted) return;
         setState(() => recognized = text);
       },
-      onFinalResult: (finalText) {
-        // Triggered when user pauses for a few seconds or stops manually
+      onFinalResult: (finalText) async {
+        if (!mounted) return;
         setState(() {
           recognized = finalText;
           listening = false;
         });
-        debugPrint('🎤 Final recognized text: $finalText');
+        await _finishAndRoute();
       },
     );
+
+    // Safety net in case the platform doesn’t trigger final
+    _safetyTimer?.cancel();
+    _safetyTimer = Timer(const Duration(seconds: 11), () async {
+      if (!mounted) return;
+      await _finishAndRoute();
+    });
   }
 
-  /// Stop the listening session
-  Future<void> _stop() async {
+  Future<void> _finishAndRoute() async {
+    _safetyTimer?.cancel();
     await _stt.stopListening();
-    setState(() => listening = false);
-  }
 
-  Future<void> _stopListening() async {
-    await _stt.stopListening();
-    setState(() => listening = false);
-
-    // Save local + Firebase
+    // Persist this round
     await DataService().saveTask('ln_listen', {
+      'round': widget.controller.roundIndex + 1,
       'recognized': recognized,
       'timestamp': DateTime.now().toIso8601String(),
     });
 
-    widget.onDoneCounting();
+    // Move to next round or result
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(
+      context,
+      '/ln-input', // hyphen route
+      arguments: widget.controller,
+    );
   }
 
   @override
   void dispose() {
+    _safetyTimer?.cancel();
     _stt.dispose();
-    _timer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final LnRound? round = widget.controller.current;
-    final number =
-        (round?.numberSeq.isNotEmpty ?? false) ? round!.numberSeq.last : 0;
+    final round = widget.controller.current;
+    final number = (round.numberSeq.isNotEmpty) ? round.numberSeq.last : 0;
     final roundNo = widget.controller.roundIndex + 1;
 
     return Scaffold(
@@ -115,11 +123,12 @@ class _LnListenScreenState extends State<LnListenScreen> {
             const SizedBox(height: 16),
             Text(
               listening
-                  ? 'Listening...'
+                  ? '🎤 Listening ${_safetyTimer?.tick ?? 0} seconds...'
                   : 'Recognized: ${recognized.isEmpty ? "(none)" : recognized}',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 16),
             ),
+            const Spacer(),
           ],
         ),
       ),

@@ -45,12 +45,11 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Word Task', activeStep: 3),
+      appBar: const HeaderBar(title: 'Word Task', activeStep: 2),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
-        child: !_showSecond
-            ? _buildIntro(context)
-            : _buildInstructions(context),
+        child:
+            !_showSecond ? _buildIntro(context) : _buildInstructions(context),
       ),
     );
   }

@@ -1,14 +1,12 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-/// Continuous Speech-to-Text Service for mCAT
-/// ------------------------------------------
-/// - Auto detects device locale (e.g. da_DK)
-/// - Keeps listening by auto-restarting after silence
-/// - Supports short pauses (default 8s)
-/// - Emits both partial and final results
-/// - Stops only when stopListening() is called
+/// ---------------------------------------------------------------------------
+/// Continuous 20-second Speech-to-Text Service for mCAT
+/// Keeps restarting when Android STT stops early
+/// ---------------------------------------------------------------------------
 class SttService {
   final stt.SpeechToText _speech = stt.SpeechToText();
 
@@ -19,20 +17,18 @@ class SttService {
   String _localeId = 'en_US';
   String _collectedText = '';
 
+  Timer? _sessionTimer;
+
   bool get isListening => _isListening;
   String get collectedText => _collectedText;
-  String get localeId => _localeId;
 
-  /// Initialize engine and detect device language.
   Future<void> init() async {
     if (_isReady) return;
-
     final available = await _speech.initialize(
       onStatus: _onStatus,
       onError: _onError,
       debugLogging: kDebugMode,
     );
-
     if (!available) {
       throw Exception('Speech recognition not available on this device.');
     }
@@ -46,110 +42,112 @@ class SttService {
     }
 
     _isReady = true;
-    if (kDebugMode) debugPrint('🎙️ STT ready, locale: $_localeId');
+    if (kDebugMode) debugPrint('🎙️ STT ready (locale: $_localeId)');
   }
 
-  /// Start continuous listening and accumulate recognized text.
-  ///
-  /// [onPartialResult] — fires on each partial update.
-  /// [onFinalResult] — fires when long silence or manual stop occurs.
-  /// [silenceTimeoutSeconds] — silence duration before restart.
-  /// [maxListenSeconds] — max session duration before restart.
+  /// Seamless listening for [durationSeconds] total
   Future<void> startListening({
     required void Function(String text) onPartialResult,
-    void Function(String text)? onFinalResult,
-    double silenceTimeoutSeconds = 8.0,
-    double maxListenSeconds = 30.0,
+    required void Function(String text) onFinalResult,
+    int durationSeconds = 20,
   }) async {
     if (!_isReady) await init();
     if (_isListening) return;
 
     _collectedText = '';
     _shouldContinue = true;
+    _isListening = true;
 
-    await _startSession(
-      onPartialResult,
-      onFinalResult,
-      silenceTimeoutSeconds,
-      maxListenSeconds,
-    );
+    if (kDebugMode)
+      debugPrint('🎧 Starting seamless $durationSeconds s session');
+
+    // stop everything after 20 s total
+    _sessionTimer?.cancel();
+    _sessionTimer = Timer(Duration(seconds: durationSeconds), () async {
+      _shouldContinue = false;
+      await stopListening();
+      onFinalResult(_collectedText);
+    });
+
+    _listenCycle(onPartialResult, onFinalResult);
   }
 
-  Future<void> _startSession(
+  /// one recognition cycle; restarted automatically
+  Future<void> _listenCycle(
     void Function(String text) onPartialResult,
-    void Function(String text)? onFinalResult,
-    double silenceTimeoutSeconds,
-    double maxListenSeconds,
+    void Function(String text) onFinalResult,
   ) async {
-    _isListening = true;
-    if (kDebugMode) debugPrint('🎧 Listening ($_localeId)...');
+    if (!_shouldContinue) return;
 
     await _speech.listen(
+      localeId: _localeId,
+      listenMode: stt.ListenMode.dictation,
+      partialResults: true,
+      listenFor: const Duration(seconds: 20),
+      pauseFor: const Duration(seconds: 20),
       onResult: (result) {
         final text = result.recognizedWords.trim();
-        if (text.isNotEmpty) {
-          if (!_collectedText.endsWith(text)) {
-            _collectedText = '$_collectedText $text'.trim();
-          }
-          onPartialResult(_collectedText);
+        if (text.isEmpty) return;
 
-          if (result.finalResult) {
-            if (kDebugMode) debugPrint('✅ Final result: $text');
-            onFinalResult?.call(_collectedText);
-          }
+        if (!_collectedText.endsWith(text)) {
+          _collectedText = '$_collectedText $text'.trim();
+        }
+
+        onPartialResult(_collectedText);
+
+        if (result.finalResult) {
+          if (kDebugMode) debugPrint('✅ Segment: $text');
+          onFinalResult(_collectedText);
         }
       },
-      localeId: _localeId,
-      partialResults: true,
-      listenMode: stt.ListenMode.dictation,
-      listenFor: Duration(seconds: maxListenSeconds.toInt()),
-      pauseFor: Duration(seconds: silenceTimeoutSeconds.toInt()),
     );
   }
 
-  /// React to engine status changes (auto-restart)
   void _onStatus(String status) {
     if (kDebugMode) debugPrint('STT status: $status');
     if (!_shouldContinue) return;
 
+    // Android reports "done" or "notListening" after a short silence
     if (status == 'done' || status == 'notListening') {
       _isListening = false;
-      Future.delayed(const Duration(milliseconds: 400), () async {
+      // restart quickly to continue same 20 s session
+      Future.delayed(const Duration(milliseconds: 200), () async {
         if (_shouldContinue && !_isListening) {
-          if (kDebugMode) debugPrint('🔁 Auto-restarting STT...');
-          await _startSession((_) {}, null, 8.0, 30.0);
+          if (kDebugMode) debugPrint('🔁 Restarting STT cycle...');
+          await _listenCycle((_) {}, (_) {});
         }
       });
     }
   }
 
-  /// Handle plugin errors and recover
   void _onError(dynamic err) {
     if (kDebugMode) debugPrint('⚠️ STT error: $err');
     _isListening = false;
     if (_shouldContinue) {
-      Future.delayed(const Duration(seconds: 1), () async {
-        if (kDebugMode) debugPrint('🔁 Restarting after error...');
-        await _startSession((_) {}, null, 8.0, 30.0);
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        if (_shouldContinue && !_isListening) {
+          if (kDebugMode) debugPrint('🔁 Restarting after error...');
+          await _listenCycle((_) {}, (_) {});
+        }
       });
     }
   }
 
-  /// Stop listening manually (user action)
   Future<void> stopListening() async {
     _shouldContinue = false;
+    _sessionTimer?.cancel();
     try {
       await _speech.stop();
     } catch (_) {
       await _speech.cancel();
     }
     _isListening = false;
-    if (kDebugMode) debugPrint('🛑 Listening stopped.');
+    if (kDebugMode) debugPrint('🛑 Listening stopped');
   }
 
-  /// Dispose service cleanly
   void dispose() {
     _shouldContinue = false;
+    _sessionTimer?.cancel();
     try {
       _speech.cancel();
     } catch (_) {}
@@ -159,6 +157,6 @@ class SttService {
     final lang = locale.languageCode.isNotEmpty ? locale.languageCode : 'en';
     final country =
         (locale.countryCode ?? '').isNotEmpty ? locale.countryCode : 'US';
-    return '${lang}_${country}';
+    return '${lang}_$country';
   }
 }

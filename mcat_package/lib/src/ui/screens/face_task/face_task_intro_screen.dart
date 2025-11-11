@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../../widgets/primary_button.dart';
-import '../../widgets/step_indicator.dart';
 import '../../widgets/header_bar.dart';
 
 class FaceTaskIntroScreen extends StatefulWidget {
