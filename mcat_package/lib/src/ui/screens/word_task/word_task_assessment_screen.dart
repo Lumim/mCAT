@@ -62,6 +62,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
         setState(() {
           recognized = finalText;
           listening = false;
+          _evaluate();
         });
         debugPrint('🎤 Final recognized text: $finalText');
       },
@@ -69,11 +70,11 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
   }
 
   /// Stop the listening session
-  Future<void> _stop() async {
+  /* Future<void> _stop() async {
     await _stt.stopListening();
     setState(() => listening = false);
   }
-
+ */
   void _evaluate() async {
     final spoken = recognized
         .toLowerCase()

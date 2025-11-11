@@ -72,12 +72,21 @@ class _McatAppState extends State<McatApp> {
           case AppRoutes.facePractice:
             return MaterialPageRoute(
               builder: (context) => FaceTaskPracticeScreen(
-                practiceImageAssets: const [
-                  'assets/images/face_1.png',
-                  'assets/images/face_2.png',
+                practiceImageAssets: [
+                  FacePracticeItem('assets/images/face_1.png', Emotion.happy),
+                  FacePracticeItem('assets/images/face_2.png', Emotion.sad),
                 ],
                 onPracticeDone: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.faceAssessment),
+                    Navigator.of(context).pushNamed(AppRoutes.faceRealTask),
+              ),
+            );
+
+          case AppRoutes.faceRealTask:
+            return MaterialPageRoute(
+              builder: (context) => FaceRealTaskScreen(
+                onNext: () {
+                  Navigator.of(context).pushNamed(AppRoutes.faceAssessment);
+                },
               ),
             );
 
