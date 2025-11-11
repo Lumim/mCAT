@@ -32,6 +32,11 @@ class _McatAppState extends State<McatApp> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = LnController([
+      LnRound.generate(level: 1, digits: 1, letters: 3),
+      LnRound.generate(level: 2, digits: 2, letters: 4),
+      LnRound.generate(level: 3, digits: 2, letters: 5),
+    ]);
     final tasks = [
       McatTask(id: 'face', title: 'Face Task'),
       McatTask(id: 'word', title: 'Word Task'),
@@ -49,7 +54,7 @@ class _McatAppState extends State<McatApp> {
         builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () =>
-              Navigator.of(navContext).pushNamed(AppRoutes.wordIntro),
+              Navigator.of(navContext).pushNamed(AppRoutes.faceIntro),
         ),
       ),
 
@@ -113,18 +118,7 @@ class _McatAppState extends State<McatApp> {
           case AppRoutes.wordPractice:
             return MaterialPageRoute(
               builder: (context) => WordTaskPracticeScreen(
-                words: const [
-                  'mountain',
-                  'city',
-                  'snowman',
-                  'coffee',
-                  'airport',
-                  'book',
-                  'cartoon',
-                  'sky',
-                  'garden',
-                  'house',
-                ],
+                words: const ['mountain', 'city', 'snowman', 'house'],
                 onFinished: () =>
                     Navigator.of(context).pushNamed(AppRoutes.wordAssessment),
               ),
@@ -164,65 +158,46 @@ class _McatAppState extends State<McatApp> {
             );
 
           // ✅ LETTER-NUMBER TASK FLOW
-          case AppRoutes.lnInstruction:
+          case AppRoutes.lnInstruction: // '/ln-instruction'
             return MaterialPageRoute(
-              builder: (context) => LnInstructionScreen(
-                onNext: () {
-                  // Create LnController with positional parameter
-                  final rounds = [
-                    LnRound.generate(level: 1, digits: 1, letters: 3),
-                    LnRound.generate(level: 2, digits: 2, letters: 4),
-                    LnRound.generate(level: 3, digits: 2, letters: 5),
-                  ];
-                  final controller = LnController(
-                    rounds,
-                  ); // Positional argument
-                  Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.lnPlay, arguments: controller);
-                },
-              ),
+              builder: (context) => LnInstructionScreen(controller: controller),
             );
 
-          case AppRoutes.lnPlay:
-            final controller = settings.arguments as LnController?;
-            if (controller == null) {
-              // Fallback if no controller provided
+          case AppRoutes.lnPlay: // '/ln-play'
+            {
+              final argController =
+                  (settings.arguments as LnController?) ?? controller;
               return MaterialPageRoute(
-                builder: (context) => Scaffold(
-                  body: Center(child: Text('Error: No controller provided')),
-                ),
+                builder: (context) => LnPlayScreen(controller: argController),
               );
             }
-            return MaterialPageRoute(
-              builder: (context) => LnPlayScreen(
-                controller: controller,
-                // Use the correct parameter name based on the package
-                onNext: () {
-                  Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.lnResult, arguments: controller);
-                },
-              ),
-            );
 
-          case AppRoutes.lnResult:
-            final controller = settings.arguments as LnController?;
-            if (controller == null) {
-              // Fallback if no controller provided
+          case AppRoutes.lnListen: // '/ln-listen'
+            {
+              final argController =
+                  (settings.arguments as LnController?) ?? controller;
               return MaterialPageRoute(
-                builder: (context) => Scaffold(
-                  body: Center(child: Text('Error: No controller provided')),
-                ),
+                builder: (context) => LnListenScreen(controller: argController),
               );
             }
-            return MaterialPageRoute(
-              builder: (context) => LnResultScreen(
-                controller: controller,
-                onNext: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.codingIntro),
-              ),
-            );
+
+          case AppRoutes.lnInput: // '/ln-input'
+            {
+              final argController =
+                  (settings.arguments as LnController?) ?? controller;
+              return MaterialPageRoute(
+                builder: (context) => LnInputScreen(controller: argController),
+              );
+            }
+
+          case AppRoutes.lnResult: // '/ln-result'
+            {
+              final argController =
+                  (settings.arguments as LnController?) ?? controller;
+              return MaterialPageRoute(
+                builder: (context) => LnResultScreen(controller: argController),
+              );
+            }
 
           // ✅ CODING TASK FLOW
           case AppRoutes.codingIntro:

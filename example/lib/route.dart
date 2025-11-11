@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mcat_package/mcat_package.dart'
+    show
+        LnIntroScreen,
+        LnInstructionScreen,
+        LnController,
+        LnPlayScreen,
+        LnListenScreen,
+        LnResultScreen;
 
 class AppRoutes {
   // Face Task
@@ -45,3 +53,41 @@ Route<dynamic> unknownRoute(RouteSettings s) => MaterialPageRoute(
   builder: (_) =>
       Scaffold(body: Center(child: Text('Unknown route: ${s.name}'))),
 );
+
+Route<dynamic> generateRoute(RouteSettings settings, LnController controller) {
+  switch (settings.name) {
+    case '/ln_intro':
+      return MaterialPageRoute(
+        builder: (_) => LnIntroScreen(controller: controller),
+      );
+
+    case '/ln_instruction':
+      return MaterialPageRoute(
+        builder: (_) => LnInstructionScreen(controller: controller),
+      );
+
+    case '/ln_play':
+      return MaterialPageRoute(
+        builder: (_) => LnPlayScreen(controller: controller),
+      );
+
+    case '/ln_listen':
+      return MaterialPageRoute(
+        builder: (_) => LnListenScreen(controller: controller),
+      );
+
+    case '/ln_result':
+      return MaterialPageRoute(
+        builder: (_) => LnResultScreen(controller: controller),
+      );
+
+    default:
+      return MaterialPageRoute(
+        builder: (_) => const Scaffold(
+          body: Center(
+            child: Text('404 – Unknown route', style: TextStyle(fontSize: 18)),
+          ),
+        ),
+      );
+  }
+}
