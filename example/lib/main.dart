@@ -73,8 +73,14 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => FaceTaskPracticeScreen(
                 practiceImageAssets: [
-                  FacePracticeItem('assets/images/face_1.png', Emotion.happy),
-                  FacePracticeItem('assets/images/face_2.png', Emotion.sad),
+                  FacePracticeItem(
+                    'assets/images/practice/face_happy_1.png',
+                    Emotion.happy,
+                  ),
+                  FacePracticeItem(
+                    'assets/images/practice/face_sad.png',
+                    Emotion.sad,
+                  ),
                 ],
                 onPracticeDone: () =>
                     Navigator.of(context).pushNamed(AppRoutes.faceRealTask),
@@ -94,8 +100,31 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => FaceTaskAssessmentScreen(
                 items: [
-                  FaceItem('assets/images/face_1.png', Emotion.happy),
-                  FaceItem('assets/images/face_2.png', Emotion.sad),
+                  FaceItem(
+                    'assets/images/practice/face_happy_1.png',
+                    Emotion.happy,
+                  ),
+                  FaceItem('assets/images/practice/face_sad.png', Emotion.sad),
+                  FaceItem(
+                    'assets/images/practice/face_fear.png',
+                    Emotion.fear,
+                  ),
+                  FaceItem(
+                    'assets/images/practice/face_neutral_1.png',
+                    Emotion.neutral,
+                  ),
+                  FaceItem(
+                    'assets/images/practice/face_surprise.png',
+                    Emotion.surprise,
+                  ),
+                  FaceItem(
+                    'assets/images/practice/face_angry.png',
+                    Emotion.angry,
+                  ),
+                  FaceItem(
+                    'assets/images/practice/face_disgust.png',
+                    Emotion.disgust,
+                  ),
                 ],
                 onFinished: (score, total) {
                   _lastScore = score;

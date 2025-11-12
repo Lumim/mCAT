@@ -16,6 +16,8 @@ class AppRoutes {
   static const faceResult = '/face_result';
   static const faceRealTask = '/face_real_task';
   static const faceIntro = '/face_intro';
+
+  // Word Task
   static const wordIntro = '/word_intro';
   static const wordPractice = '/word_practice';
   static const wordAssessment = '/word_assessment';
