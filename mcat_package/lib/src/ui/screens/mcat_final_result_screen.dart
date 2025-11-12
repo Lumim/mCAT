@@ -3,9 +3,12 @@ import 'package:mcat_package/src/services/data_service.dart';
 import 'package:mcat_package/src/domain/models/task_record.dart';
 import '../widgets/header_bar.dart';
 import '../widgets/primary_button.dart';
+import 'package:mcat_package/src/services/asset_provider.dart';
 
 class McatFinalResultScreen extends StatefulWidget {
-  const McatFinalResultScreen({super.key});
+  final AssetProvider assetProvider;
+  const McatFinalResultScreen(
+      {super.key, this.assetProvider = const PackageAssetProvider()});
 
   @override
   State<McatFinalResultScreen> createState() => _McatFinalResultScreenState();

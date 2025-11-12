@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'step_indicator.dart';
+import 'package:mcat_package/src/services/asset_provider.dart';
 
 class HeaderBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final int? activeStep;
   final int totalSteps;
   final bool showCloseButton;
+  final AssetProvider assetProvider;
 
   const HeaderBar({
     super.key,
@@ -13,6 +15,7 @@ class HeaderBar extends StatelessWidget implements PreferredSizeWidget {
     this.activeStep,
     this.totalSteps = 5,
     this.showCloseButton = true,
+    this.assetProvider = const PackageAssetProvider(),
   });
 
   @override
@@ -27,7 +30,8 @@ class HeaderBar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           children: [
             Image.asset(
-              'assets/images/carp_logo.png',
+              assetProvider.logo,
+              package: 'mcat_package',
               height: 28,
               fit: BoxFit.contain,
             ),

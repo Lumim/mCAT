@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../domain/models/mcat_task.dart';
 import '../widgets/primary_button.dart';
+import '../../services/asset_provider.dart';
 
 class IntroScreen extends StatefulWidget {
   final VoidCallback? onStart;
   final List<McatTask> tasks;
-  const IntroScreen({super.key, required this.onStart, required this.tasks});
+  const IntroScreen({
+    super.key,
+    required this.onStart,
+    required this.tasks,
+  });
 
   @override
   State<IntroScreen> createState() => _IntroScreenState();
@@ -73,7 +78,8 @@ class _IntroScreenState extends State<IntroScreen> {
         children: [
           const Spacer(),
           Image.asset(
-            'assets/images/logo.png',
+            widget.assetProvider.logo,
+            package: 'mcat_package',
             height: 120,
             fit: BoxFit.contain,
           ),
