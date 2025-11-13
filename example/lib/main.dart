@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:mcat_package/mcat_package.dart';
 import './route.dart';
+import 'mcat_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +17,6 @@ Future<void> main() async {
 
   // Initialize DataService for autosync (Hive + Firebase)
   await DataService().init();
-
   runApp(const McatApp());
 }
 
@@ -54,7 +54,7 @@ class _McatAppState extends State<McatApp> {
         builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () =>
-              Navigator.of(navContext).pushNamed(AppRoutes.faceIntro),
+              Navigator.of(navContext).pushNamed(AppRoutes.codingPractice),
         ),
       ),
 
@@ -164,25 +164,19 @@ class _McatAppState extends State<McatApp> {
 
           case AppRoutes.wordAssessment:
             return MaterialPageRoute(
-              builder: (context) => WordTaskAssessmentScreen(
-                words: const [
-                  'mountain',
-                  'city',
-                  'snowman',
-                  'coffee',
-                  'airport',
-                  'book',
-                  'cartoon',
-                  'sky',
-                  'garden',
-                  'house',
-                ],
-                onFinished: (score, total) {
-                  _lastScore = score;
-                  _lastTotal = total;
-                  Navigator.of(context).pushNamed(AppRoutes.wordResult);
-                },
-              ),
+              builder: (context) {
+                final locale = McatSettings.appLocale;
+                final words = McatSettings.wordTaskWords(locale);
+
+                return WordTaskAssessmentScreen(
+                  words: words,
+                  onFinished: (score, total) {
+                    _lastScore = score;
+                    _lastTotal = total;
+                    Navigator.of(context).pushNamed(AppRoutes.wordResult);
+                  },
+                );
+              },
             );
 
           case AppRoutes.wordResult:
@@ -237,6 +231,51 @@ class _McatAppState extends State<McatApp> {
               );
             }
 
+          // ✅ WORD RECALL TASK FLOW (delayed recall of Word Task words)
+          case AppRoutes.wordRecallIntro:
+            return MaterialPageRoute(
+              builder: (context) => WordRecallIntroScreen(
+                onStart: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.wordRecallInstruction),
+              ),
+            );
+
+          case AppRoutes.wordRecallInstruction:
+            return MaterialPageRoute(
+              builder: (context) => WordRecallInstructionScreen(
+                onStartListening: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.wordRecallInput),
+              ),
+            );
+
+          case AppRoutes.wordRecallInput:
+            return MaterialPageRoute(
+              builder: (context) {
+                final locale = McatSettings.appLocale;
+                final words = McatSettings.wordTaskWords(locale);
+
+                return WordRecallInputScreen(
+                  targetWords: words,
+                  onFinished: (score, total) {
+                    _lastScore = score;
+                    _lastTotal = total;
+                    Navigator.of(context).pushNamed(AppRoutes.wordRecallResult);
+                  },
+                );
+              },
+            );
+
+          case AppRoutes.wordRecallResult:
+            return MaterialPageRoute(
+              builder: (context) => WordRecallResultScreen(
+                correct: _lastScore,
+                total: _lastTotal,
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.codingIntro),
+                // or finalMcatResult or whatever is your next task
+              ),
+            );
           // ✅ CODING TASK FLOW
           case AppRoutes.codingIntro:
             return MaterialPageRoute(
@@ -249,6 +288,13 @@ class _McatAppState extends State<McatApp> {
           case AppRoutes.codingPractice:
             return MaterialPageRoute(
               builder: (context) => CodingPracticeScreen(
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.codingRealText),
+              ),
+            );
+          case AppRoutes.codingRealText:
+            return MaterialPageRoute(
+              builder: (context) => CodingRealTextScreen(
                 onNext: () =>
                     Navigator.of(context).pushNamed(AppRoutes.codingAssessment),
               ),

@@ -36,14 +36,16 @@ class AppRoutes {
   static const lnInput = '/ln-input';
   static const lnResult = '/ln-result';
 
-  static const wordRecallIntro = '/word-recall-intro';
-  static const wordRecallInstruction = '/word-recall-instruction';
-  static const wordRecallListen = '/word-recall-listen';
-  static const wordRecallResult = '/word-recall-result';
+static const wordRecallIntro = '/word-recall-intro';
+static const wordRecallInstruction = '/word-recall-instruction';
+static const wordRecallInput = '/word-recall-input';
+static const wordRecallResult = '/word-recall-result';
+
 
   static const codingIntro = '/coding-intro';
   static const codingPractice = '/coding-practice';
   static const codingAssessment = '/coding-assessment';
+  static const codingRealText = '/coding-real-text';
 
   static const finalMcatResult = '/final-mcat-result';
 }
