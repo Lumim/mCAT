@@ -27,12 +27,13 @@ class _LnListenScreenState extends State<LnListenScreen> {
 
   Future<void> _start() async {
     await _stt.init();
+    // print('the number is: ${widget.toString()}');
     setState(() {
       listening = true;
       recognized = '';
     });
 
-    // 20s seamless capture; restarts internally if Android stops early.
+    // This await might complete BEFORE you create the safety timer
     await _stt.startListening(
       durationSeconds: 10,
       onPartialResult: (text) {
@@ -45,12 +46,12 @@ class _LnListenScreenState extends State<LnListenScreen> {
           recognized = finalText;
           listening = false;
         });
-        await _finishAndRoute();
+        await _finishAndRoute(); // This stops everything
       },
     );
 
-    // Safety net in case the platform doesn’t trigger final
-    _safetyTimer?.cancel();
+    // Safety timer is created AFTER stt.startListening might have already finished
+
     _safetyTimer = Timer(const Duration(seconds: 11), () async {
       if (!mounted) return;
       await _finishAndRoute();
@@ -87,7 +88,8 @@ class _LnListenScreenState extends State<LnListenScreen> {
   @override
   Widget build(BuildContext context) {
     final round = widget.controller.current;
-    final number = (round.numberSeq.isNotEmpty) ? round.numberSeq.last : 0;
+    final number = (round.numberSeq.isNotEmpty) ? round.numberSeq.last : 100;
+
     final roundNo = widget.controller.roundIndex + 1;
 
     return Scaffold(
@@ -110,7 +112,7 @@ class _LnListenScreenState extends State<LnListenScreen> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 24, horizontal: 48),
                 child: Text(
-                  '$number',
+                  '${widget.controller.current.numberSeq.join('')}',
                   style: const TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.bold,
@@ -123,7 +125,7 @@ class _LnListenScreenState extends State<LnListenScreen> {
             const SizedBox(height: 16),
             Text(
               listening
-                  ? '🎤 Listening ${_safetyTimer?.tick ?? 0} seconds...'
+                  ? '🎤 Listening ${_safetyTimer?.tick ?? 0} seconds... the number starts from ${widget.controller.current.numberSeq.join(',')}'
                   : 'Recognized: ${recognized.isEmpty ? "(none)" : recognized}',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 16),

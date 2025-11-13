@@ -5,7 +5,6 @@ import '../../../services/coding_service.dart';
 import '../../../domain/models/coding_task_models.dart';
 import '../../../services/data_service.dart';
 import '../../widgets/header_bar.dart';
-import '../../widgets/primary_button.dart';
 
 class CodingAssessmentScreen extends StatefulWidget {
   final VoidCallback onFinish;
@@ -33,13 +32,18 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
     _sequence = CodingService.generateSequence(total);
     _anim = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        _anim.forward(from: 0.0);
+      }
+    });
     _startTimer();
   }
 
   void _startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() => elapsed++);
-      if (elapsed >= 400) _completeTask(showPopup: true);
+      if (elapsed >= 60) _completeTask(showPopup: true);
     });
   }
 
@@ -98,7 +102,7 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
   @override
   Widget build(BuildContext context) {
     final current = _sequence[index];
-    final remaining = 400 - elapsed;
+    final remaining = 60 - elapsed;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
@@ -109,7 +113,8 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
           children: [
             _buildReferenceTable(),
             const Divider(thickness: 1),
-            Text('${current.code}Sequence ${index + 1}/$total • Time left: $remaining s',
+            Text(
+                '${current.code}Sequence ${index + 1}/$total • Time left: $remaining s',
                 style: const TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 14),
             ScaleTransition(

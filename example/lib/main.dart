@@ -37,10 +37,18 @@ class _McatAppState extends State<McatApp> {
       LnRound.generate(level: 2, digits: 2, letters: 4),
       LnRound.generate(level: 3, digits: 2, letters: 5),
     ]);
+    final orgController = OrgController([
+      OrgRound.generate(digits: 2, letters: 2),
+      OrgRound.generate(digits: 3, letters: 2),
+      OrgRound.generate(digits: 3, letters: 3),
+    ]);
+
     final tasks = [
       McatTask(id: 'face', title: 'Face Task'),
       McatTask(id: 'word', title: 'Word Task'),
       McatTask(id: 'letter-number', title: 'Letter-Number Task'),
+      McatTask(id: 'organizational', title: 'Organizational Task'),
+      McatTask(id: 'word-recall', title: 'Word Recall Task'),
       McatTask(id: 'coding', title: 'Coding Task'),
     ];
 
@@ -54,7 +62,7 @@ class _McatAppState extends State<McatApp> {
         builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () =>
-              Navigator.of(navContext).pushNamed(AppRoutes.codingPractice),
+              Navigator.of(navContext).pushNamed(AppRoutes.lnInstruction),
         ),
       ),
 
@@ -65,7 +73,8 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => FaceTaskIntroScreen(
                 onNext: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.facePractice),
+                    //  Navigator.of(context).pushNamed(AppRoutes.facePractice),
+                    Navigator.of(context).pushNamed(AppRoutes.lnResult),
               ),
             );
 
@@ -231,6 +240,49 @@ class _McatAppState extends State<McatApp> {
               );
             }
 
+          case AppRoutes.orgIntro:
+            return MaterialPageRoute(
+              builder: (context) => OrgIntroScreen(controller: orgController),
+            );
+
+          case AppRoutes.orgInstruction:
+            return MaterialPageRoute(
+              builder: (context) =>
+                  OrgInstructionScreen(controller: orgController),
+            );
+
+          case AppRoutes.orgPlay:
+            {
+              final orgCltr =
+                  (settings.arguments as OrgController?) ?? orgController;
+              return MaterialPageRoute(
+                builder: (_) => OrgPlayScreen(controller: orgCltr),
+              );
+            }
+
+          case AppRoutes.orgInput:
+            {
+              final orgCltr =
+                  (settings.arguments as OrgController?) ?? orgController;
+              return MaterialPageRoute(
+                builder: (_) => OrgInputScreen(controller: orgCltr),
+              );
+            }
+
+          case AppRoutes.orgResult:
+            {
+              final orgCltr =
+                  (settings.arguments as OrgController?) ?? orgController;
+              return MaterialPageRoute(
+                builder: (_) => OrgResultScreen(
+                  controller: orgCltr,
+                  onNextTask: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.finalMcatResult),
+                ),
+              );
+            }
+
           // ✅ WORD RECALL TASK FLOW (delayed recall of Word Task words)
           case AppRoutes.wordRecallIntro:
             return MaterialPageRoute(
@@ -276,6 +328,7 @@ class _McatAppState extends State<McatApp> {
                 // or finalMcatResult or whatever is your next task
               ),
             );
+
           // ✅ CODING TASK FLOW
           case AppRoutes.codingIntro:
             return MaterialPageRoute(

@@ -4,6 +4,7 @@ export 'src/domain/models/word_task.dart';
 export 'src/domain/models/letter_number_models.dart';
 export 'src/domain/models/word_recall_models.dart';
 export 'src/domain/models/coding_task_models.dart';
+export 'src/domain/models/organizational_models.dart';
 export 'src/services/data_service.dart';
 export 'src/services/connectivity_service.dart';
 export 'src/ui/screens/intro_screen.dart';
@@ -39,6 +40,12 @@ export 'src/ui/screens/coding_task/coding_intro_screen.dart';
 export 'src/ui/screens/coding_task/coding_practice_screen.dart';
 export 'src/ui/screens/coding_task/coding_assessment_screen.dart';
 export 'src/ui/screens/coding_task/coding_real_text_screen.dart';
+// Organizational Task screens
+export 'src/ui/screens/organizational_task/org_intro_screen.dart';
+export 'src/ui/screens/organizational_task/org_instruction_screen.dart';
+export 'src/ui/screens/organizational_task/org_play_screen.dart';
+export 'src/ui/screens/organizational_task/org_input_screen.dart';
+export 'src/ui/screens/organizational_task/org_result_screen.dart';
 
 export 'src/ui/screens/mcat_final_result_screen.dart';
 

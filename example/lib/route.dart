@@ -6,7 +6,12 @@ import 'package:mcat_package/mcat_package.dart'
         LnController,
         LnPlayScreen,
         LnListenScreen,
-        LnResultScreen;
+        LnResultScreen,
+        OrgInputScreen,
+        OrgResultScreen,
+        OrgInstructionScreen,
+        OrgIntroScreen,
+        OrgPlayScreen;
 
 class AppRoutes {
   // Face Task
@@ -23,12 +28,7 @@ class AppRoutes {
   static const wordAssessment = '/word_assessment';
   static const wordResult = '/word_result';
 
-  // Word Task
-  /* static const wordIntro = '/word_intro';
-  static const wordPractice = '/word_practice';
-  static const wordAssessment = '/word_assessment';
-  static const wordResult = '/word_result'; */
-
+  // Letter–Number Task
   static const lnIntro = '/ln-intro';
   static const lnInstruction = '/ln-instruction';
   static const lnPlay = '/ln-play';
@@ -36,11 +36,17 @@ class AppRoutes {
   static const lnInput = '/ln-input';
   static const lnResult = '/ln-result';
 
-static const wordRecallIntro = '/word-recall-intro';
-static const wordRecallInstruction = '/word-recall-instruction';
-static const wordRecallInput = '/word-recall-input';
-static const wordRecallResult = '/word-recall-result';
+  // Organizational Task
+  static const orgIntro = '/org-intro';
+  static const orgInstruction = '/org-instruction';
+  static const orgPlay = '/org-play';
+  static const orgInput = '/org-input';
+  static const orgResult = '/org-result';
 
+  static const wordRecallIntro = '/word-recall-intro';
+  static const wordRecallInstruction = '/word-recall-instruction';
+  static const wordRecallInput = '/word-recall-input';
+  static const wordRecallResult = '/word-recall-result';
 
   static const codingIntro = '/coding-intro';
   static const codingPractice = '/coding-practice';

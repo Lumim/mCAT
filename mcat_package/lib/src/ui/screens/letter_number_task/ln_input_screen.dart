@@ -5,8 +5,9 @@ import 'package:mcat_package/src/services/data_service.dart';
 
 class LnInputScreen extends StatefulWidget {
   final LnController controller;
-  const LnInputScreen({super.key, required this.controller});
+  //final List<String> letters = controller.current.letterSeq;
 
+  const LnInputScreen({super.key, required this.controller});
   @override
   State<LnInputScreen> createState() => _LnInputScreenState();
 }
@@ -21,10 +22,22 @@ class _LnInputScreenState extends State<LnInputScreen> {
   }
 
   Future<void> _onContinue() async {
+    String input = _ctrl.text.toUpperCase();
+    int calculatedScore = 0;
+
+    // Calculate score based on current input
+    for (int i = 0; i < input.length; i++) {
+      String char = input[i];
+      if (widget.controller.current.letterSeq.contains(char)) {
+        calculatedScore++;
+      }
+    }
+    print('Calculated Score: ${calculatedScore.toString()}');
+
     // Optional: persist per-round input
     await DataService().saveTask('ln_input', {
       'round': widget.controller.roundIndex + 1,
-      'value': _ctrl.text.trim(),
+      'value': calculatedScore,
       'timestamp': DateTime.now().toIso8601String(),
     });
 
@@ -53,17 +66,27 @@ class _LnInputScreenState extends State<LnInputScreen> {
     final roundNo = widget.controller.roundIndex + 1;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: HeaderBar(title: 'LN – Input (Round $roundNo)', activeStep: 3),
+      appBar: HeaderBar(title: 'Letter-Number Task ($roundNo)', activeStep: 3),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const Text('Enter a starting number (optional):'),
+            const Text('Enter the Letters:'),
             const SizedBox(height: 12),
             TextField(
               controller: _ctrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
+              autofocus: true,
+              textCapitalization: TextCapitalization.characters,
+              textAlign: TextAlign.center,
+              maxLength: widget.controller.current.letterSeq.length,
+              decoration: InputDecoration(
+                counterText: widget.controller.current.letterSeq.join(', '),
+                hintText: 'Type here',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (val) {
+                val = val.toUpperCase();
+              },
             ),
             const Spacer(),
             ElevatedButton(

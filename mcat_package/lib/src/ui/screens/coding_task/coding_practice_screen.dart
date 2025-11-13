@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../services/coding_service.dart';
 import '../../../domain/models/coding_task_models.dart';
 import '../../widgets/header_bar.dart';
-import '../../widgets/primary_button.dart';
 
 class CodingPracticeScreen extends StatefulWidget {
   final VoidCallback onNext;
@@ -75,7 +74,7 @@ class _CodingPracticeScreenState extends State<CodingPracticeScreen>
           children: [
             _buildReferenceTable(),
             const Divider(thickness: 1),
-           
+
             /* Text('Fill in the box with correct words',
                 style: const TextStyle(fontSize: 15)), */
             const SizedBox(height: 8),

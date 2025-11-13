@@ -23,7 +23,7 @@ class WordRecallResultScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F6FB),
       appBar: const HeaderBar(
         title: 'Word Recall',
-        activeStep: 1,
+        activeStep: 4,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),

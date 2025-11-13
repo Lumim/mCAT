@@ -76,10 +76,7 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
   }
 
   List<String> _splitWords(String text) {
-    return text
-        .split(RegExp(r'\s+'))
-        .where((word) => word.isNotEmpty)
-        .toList();
+    return text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
   }
 
   Future<void> _evaluateAndSave() async {
@@ -120,7 +117,7 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Word Recall', activeStep: 1),
+      appBar: const HeaderBar(title: 'Word Recall', activeStep: 4),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -181,9 +178,8 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
                 label: saving
                     ? 'Saving...'
                     : 'Next (${score.toString()} / $total)',
-                onPressed: saving
-                    ? null
-                    : () => widget.onFinished(score, total),
+                onPressed:
+                    saving ? null : () => widget.onFinished(score, total),
               ),
           ],
         ),
