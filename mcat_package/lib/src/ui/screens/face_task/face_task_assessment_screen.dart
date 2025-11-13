@@ -128,12 +128,16 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
                   duration: const Duration(milliseconds: 300),
                   child: showImage
                       ? Column(
-                          key: ValueKey('img_$index'),
+                         key: ValueKey('img_$index'),
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Expanded(
-                              child: Image.asset(current.asset,
-                                  fit: BoxFit.contain),
+                              child: Image.asset(
+                                current.asset,
+                                // ✅ IMPORTANT: load asset from package
+                                package: 'mcat_package',
+                                fit: BoxFit.contain,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             AnimatedBuilder(

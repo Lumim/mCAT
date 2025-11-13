@@ -1,83 +1,103 @@
 import 'package:flutter/material.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/primary_button.dart';
-import '../../../services/tts_service.dart';
 
-class WordRecallInstructionScreen extends StatefulWidget {
-  final VoidCallback onNext;
-  const WordRecallInstructionScreen({super.key, required this.onNext});
+class WordRecallInstructionScreen extends StatelessWidget {
+  final VoidCallback onStartListening;
 
-  @override
-  State<WordRecallInstructionScreen> createState() =>
-      _WordRecallInstructionScreenState();
-}
+  const WordRecallInstructionScreen({
+    super.key,
+    required this.onStartListening,
+  });
 
-class _WordRecallInstructionScreenState
-    extends State<WordRecallInstructionScreen> {
-  final _tts = TtsService();
-
-  @override
-  void dispose() {
-    _tts.dispose();
-    super.dispose();
-  }
-
-  Future<void> _playInstruction() async {
-    await _tts.speak(
-        'Please speak loudly and clearly. Try to recall as many words as you can from the earlier task.');
+  Widget _buildBullet(IconData icon, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 22, color: Colors.black87),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Word Recall Task', activeStep: 4),
+      appBar: const HeaderBar(
+        title: 'Word Recall',
+        activeStep: 1,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 16),
-            const Text('Instructions',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 16),
-            _infoCard(
-              'It is important that you speak loud and clear and that you try to avoid saying anything other than the words. '
-              'Make a short pause between words when repeating them.',
-            ),
-            const SizedBox(height: 20),
-            TextButton.icon(
-              onPressed: _playInstruction,
-              icon: const Icon(Icons.play_circle_fill, color: Colors.blue),
-              label: const Text(
-                'Hear instructions',
-                style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Instructions',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'You will now be asked to recall the words that were presented earlier '
+                    'in the Word Task. You will not hear the words again.',
+                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildBullet(
+                    Icons.volume_up_outlined,
+                    'Listen carefully. Each word is only played once.',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildBullet(
+                    Icons.visibility_off_outlined,
+                    'Do not write anything down during the task.',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildBullet(
+                    Icons.lightbulb_outline,
+                    'Just relax and remember as many words as you can.',
+                  ),
+                ],
               ),
             ),
             const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Back')),
-                PrimaryButton(
-                    label: 'Start Assessment', onPressed: widget.onNext),
-              ],
+            PrimaryButton(
+              label: 'Start Listening',
+              onPressed: onStartListening,
             ),
           ],
         ),
       ),
     );
   }
-
-  Widget _infoCard(String text) => Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(text, style: const TextStyle(fontSize: 15, height: 1.4)),
-        ),
-      );
 }

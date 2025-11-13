@@ -39,7 +39,7 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
   void _startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() => elapsed++);
-      if (elapsed >= 40) _completeTask(showPopup: true);
+      if (elapsed >= 400) _completeTask(showPopup: true);
     });
   }
 
@@ -98,7 +98,7 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
   @override
   Widget build(BuildContext context) {
     final current = _sequence[index];
-    final remaining = 40 - elapsed;
+    final remaining = 400 - elapsed;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
@@ -109,7 +109,7 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
           children: [
             _buildReferenceTable(),
             const Divider(thickness: 1),
-            Text('Sequence ${index + 1}/$total • Time left: $remaining s',
+            Text('${current.code}Sequence ${index + 1}/$total • Time left: $remaining s',
                 style: const TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 14),
             ScaleTransition(

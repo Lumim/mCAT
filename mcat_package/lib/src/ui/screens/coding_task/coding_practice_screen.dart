@@ -79,7 +79,7 @@ class _CodingPracticeScreenState extends State<CodingPracticeScreen>
             /* Text('Fill in the box with correct words',
                 style: const TextStyle(fontSize: 15)), */
             const SizedBox(height: 8),
-            Text('Sequence ${index + 1}${_sequence.length}',
+            Text('Sequence ${index + 1}/${_sequence.length} ${current.code}',
                 style: const TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             ScaleTransition(

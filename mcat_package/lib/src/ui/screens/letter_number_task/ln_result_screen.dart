@@ -25,7 +25,7 @@ class LnResultScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Navigator.pushReplacementNamed(
                 context,
-                '/coding-intro', // hyphen route
+                '/word-recall-intro', // hyphen route
                 arguments: controller,
               ),
               child: const Text('Done'),

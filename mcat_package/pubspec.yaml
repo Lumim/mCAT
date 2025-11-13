@@ -58,7 +58,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-assets:
+  assets:
     # General app assets
     - assets/images/logo.png
     - assets/images/carp_logo.png

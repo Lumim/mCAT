@@ -1,52 +1,92 @@
 import 'package:flutter/material.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/primary_button.dart';
-import '../../../domain/models/word_recall_models.dart';
 
 class WordRecallResultScreen extends StatelessWidget {
-  final WordRecallResult result;
+  final int correct;
+  final int total;
   final VoidCallback onNext;
-  const WordRecallResultScreen(
-      {super.key, required this.result, required this.onNext});
+
+  const WordRecallResultScreen({
+    super.key,
+    required this.correct,
+    required this.total,
+    required this.onNext,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final accuracy = total == 0 ? 0.0 : correct / total;
+    final percent = (accuracy * 100).round();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Word Recall Task', activeStep: 4),
+      appBar: const HeaderBar(
+        title: 'Word Recall',
+        activeStep: 1,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const SizedBox(height: 30),
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  'You have scored ${result.correctCount} out of ${result.total} in the Word Recall Task!',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.w600),
-                ),
+            const SizedBox(height: 16),
+            const Text(
+              'Results',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 24),
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.green.shade600,
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ],
               ),
-              child: const Text(
-                'Answer submitted',
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              child: Column(
+                children: [
+                  Text(
+                    '$correct / $total words recalled',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '$percent %',
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Thank you for completing the word recall task.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
             const Spacer(),
-            PrimaryButton(label: 'Next', onPressed: onNext),
+            PrimaryButton(
+              label: 'Next Task',
+              onPressed: onNext,
+            ),
           ],
         ),
       ),

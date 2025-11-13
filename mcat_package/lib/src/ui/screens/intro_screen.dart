@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import '../../domain/models/mcat_task.dart';
 import '../widgets/primary_button.dart';
 import '../../services/asset_provider.dart';
+import '../widgets/header_bar.dart';
 
 class IntroScreen extends StatefulWidget {
   final VoidCallback? onStart;
   final List<McatTask> tasks;
+
   const IntroScreen({
     super.key,
     required this.onStart,
@@ -23,39 +25,7 @@ class _IntroScreenState extends State<IntroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Row(
-            children: [
-              Image.asset(
-                'assets/images/carp_logo.png',
-                height: 28,
-                fit: BoxFit.contain,
-              ),
-              /*   const SizedBox(width: 8),
-              const Text(
-                'CARP',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                ),
-              ), */
-            ],
-          ),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.close, color: Colors.black54),
-          ),
-        ],
-      ),
+      appBar: const HeaderBar(title: 'Welcome', activeStep: 1),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (child, animation) => FadeTransition(
@@ -70,6 +40,8 @@ class _IntroScreenState extends State<IntroScreen> {
   }
 
   Widget _buildIntro(BuildContext context, {Key? key}) {
+    final assets = ServiceLocator.assetProvider;
+
     return Padding(
       key: key,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -78,7 +50,7 @@ class _IntroScreenState extends State<IntroScreen> {
         children: [
           const Spacer(),
           Image.asset(
-            widget.assetProvider.logo,
+            assets.logo,
             package: 'mcat_package',
             height: 120,
             fit: BoxFit.contain,
@@ -135,13 +107,20 @@ class _IntroScreenState extends State<IntroScreen> {
                   style: TextStyle(fontSize: 14, color: Colors.black87),
                 ),
                 const SizedBox(height: 20),
-                _buildBullet(Icons.block,
-                    'You cannot pause mCAT tasks, so please visit the toilet now if needed'),
+                _buildBullet(
+                  Icons.block,
+                  'You cannot pause mCAT tasks, so please visit the toilet now if needed',
+                ),
                 const SizedBox(height: 12),
-                _buildBullet(Icons.volume_off_outlined, 'Sit in a quiet room.'),
+                _buildBullet(
+                  Icons.volume_off_outlined,
+                  'Sit in a quiet room.',
+                ),
                 const SizedBox(height: 12),
-                _buildBullet(Icons.meeting_room_outlined,
-                    'Close the door to avoid distractions.'),
+                _buildBullet(
+                  Icons.meeting_room_outlined,
+                  'Close the door to avoid distractions.',
+                ),
               ],
             ),
           ),

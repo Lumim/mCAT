@@ -1,18 +1,18 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../domain/models/emotion.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/header_bar.dart';
-import 'dart:async';
 
 class FacePracticeItem {
-  final String asset;
+  final String asset;   // e.g. 'assets/images/practice/face_happy.png'
   final Emotion correct;
   FacePracticeItem(this.asset, this.correct);
 }
 
 class FaceTaskPracticeScreen extends StatefulWidget {
-  final List<FacePracticeItem>
-      practiceImageAssets; // e.g., ['assets/images/face_1.png', 'assets/images/face_2.png']
+  /// List of practice items (image + correct emotion)
+  final List<FacePracticeItem> practiceImageAssets;
   final VoidCallback onPracticeDone;
 
   const FaceTaskPracticeScreen({
@@ -22,7 +22,8 @@ class FaceTaskPracticeScreen extends StatefulWidget {
   });
 
   @override
-  State<FaceTaskPracticeScreen> createState() => _FaceTaskPracticeScreenState();
+  State<FaceTaskPracticeScreen> createState() =>
+      _FaceTaskPracticeScreenState();
 }
 
 class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
@@ -30,8 +31,11 @@ class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
   int index = 0;
   Emotion? selected;
   bool showImage = true;
+  bool _finished = false;
+
   Timer? _timer;
   late AnimationController _progressController;
+
   @override
   void initState() {
     super.initState();
@@ -45,37 +49,49 @@ class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
   void _startTimer() {
     _timer?.cancel();
     _progressController.forward(from: 0);
-    setState(() => showImage = true);
+    setState(() {
+      showImage = true;
+      selected = null;
+    });
 
     _timer = Timer(const Duration(seconds: 3), () {
-      if (mounted) setState(() => showImage = false);
+      if (!mounted) return;
+      setState(() => showImage = false);
     });
   }
 
   void _next() {
     setState(() {
+      index++;
       selected = null;
       showImage = true;
-      index++;
     });
     _startTimer();
   }
 
-  void _selectEmotion(Emotion e) async {
-    if (!showImage && selected == null) {
+  Future<void> _selectEmotion(Emotion e) async {
+    // only allow selection when image is hidden and nothing selected yet
+    if (showImage || selected != null || _finished) return;
+
+    setState(() {
       selected = e;
-      //final img = widget.practiceImageAssets[index];
+    });
 
-      // small delay to show feedback
-      await Future.delayed(const Duration(milliseconds: 400));
+    // small delay to show feedback
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
 
-      if (index < widget.practiceImageAssets.length - 1) {
-        _next();
-      } else {
-        widget.onPracticeDone();
-      }
-      setState(() {});
+    if (index < widget.practiceImageAssets.length - 1) {
+      _next();
+    } else {
+      _finishPractice();
     }
+  }
+
+  void _finishPractice() {
+    if (_finished) return;
+    _finished = true;
+    widget.onPracticeDone();
   }
 
   @override
@@ -87,9 +103,14 @@ class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final img = widget.practiceImageAssets[index];
+    if (index >= widget.practiceImageAssets.length) {
+      return const SizedBox.shrink();
+    }
+
+    final item = widget.practiceImageAssets[index];
+
     return Scaffold(
-      /* appBar: AppBar(title: const Text('Face Task – Practice')), */
+      backgroundColor: const Color(0xFFF5F6FB),
       appBar: const HeaderBar(title: 'Face Task', activeStep: 1),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -101,7 +122,10 @@ class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
               showImage
                   ? 'Look at the face for 3 seconds.'
                   : 'Select the emotion you saw:',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -115,8 +139,11 @@ class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Expanded(
-                              child:
-                                  Image.asset(img.asset, fit: BoxFit.contain),
+                              child: Image.asset(
+                                item.asset,
+                                package: 'mcat_package', // ✅ load from package
+                                fit: BoxFit.contain,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             AnimatedBuilder(
@@ -151,9 +178,7 @@ class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
                 children: [
                   PrimaryButton(
                     label: 'Finish',
-                    onPressed: () async {
-                      widget.onPracticeDone();
-                    },
+                    onPressed: _finishPractice,
                   ),
                 ],
               ),

@@ -1,12 +1,14 @@
+// lib/services/asset_provider.dart
+
 abstract class AssetProvider {
   String get logo;
   String get face1;
   String get face2;
-  // ... all other assets
+  // add other assets here...
 }
 
 class PackageAssetProvider implements AssetProvider {
-  const PackageAssetProvider(); // Add const constructor
+  const PackageAssetProvider();
 
   @override
   String get logo => 'assets/images/carp_logo.png';
@@ -17,5 +19,16 @@ class PackageAssetProvider implements AssetProvider {
   @override
   String get face2 => 'assets/images/face_2.png';
 
-  // Helper method to load image with package con
+  // ...and the rest of your assets
+}
+
+// ✅ Simple global locator for assets
+class ServiceLocator {
+  /// Default to using the package assets so it "just works"
+  static AssetProvider assetProvider = const PackageAssetProvider();
+
+  /// Optional: override from the host app if needed
+  static void setAssetProvider(AssetProvider provider) {
+    assetProvider = provider;
+  }
 }
