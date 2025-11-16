@@ -61,7 +61,8 @@ class _McatAppState extends State<McatApp> {
       home: Builder(
         builder: (navContext) => IntroScreen(
           tasks: tasks,
-          onStart: () => Navigator.of(navContext).pushNamed(AppRoutes.orgIntro),
+          onStart: () =>
+              Navigator.of(navContext).pushNamed(AppRoutes.wordIntro),
         ),
       ),
 
@@ -197,13 +198,13 @@ class _McatAppState extends State<McatApp> {
               ),
             );
 
-          // ✅ LETTER-NUMBER TASK FLOW
-          case AppRoutes.lnInstruction: // '/ln-instruction'
+          // ✅ LETTER_NUMBER TASK FLOW
+          case AppRoutes.lnInstruction: // '/ln_instruction'
             return MaterialPageRoute(
               builder: (context) => LnInstructionScreen(controller: controller),
             );
 
-          case AppRoutes.lnPlay: // '/ln-play'
+          case AppRoutes.lnPlay: // '/ln_play'
             {
               final argController =
                   (settings.arguments as LnController?) ?? controller;
@@ -212,7 +213,7 @@ class _McatAppState extends State<McatApp> {
               );
             }
 
-          case AppRoutes.lnListen: // '/ln-listen'
+          case AppRoutes.lnListen: // '/ln_listen'
             {
               final argController =
                   (settings.arguments as LnController?) ?? controller;
@@ -221,7 +222,7 @@ class _McatAppState extends State<McatApp> {
               );
             }
 
-          case AppRoutes.lnInput: // '/ln-input'
+          case AppRoutes.lnInput: // '/ln_input'
             {
               final argController =
                   (settings.arguments as LnController?) ?? controller;
@@ -230,7 +231,7 @@ class _McatAppState extends State<McatApp> {
               );
             }
 
-          case AppRoutes.lnResult: // '/ln-result'
+          case AppRoutes.lnResult: // '/ln_result'
             {
               final argController =
                   (settings.arguments as LnController?) ?? controller;

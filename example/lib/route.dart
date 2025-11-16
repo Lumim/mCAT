@@ -6,12 +6,7 @@ import 'package:mcat_package/mcat_package.dart'
         LnController,
         LnPlayScreen,
         LnListenScreen,
-        LnResultScreen,
-        OrgInputScreen,
-        OrgResultScreen,
-        OrgInstructionScreen,
-        OrgIntroScreen,
-        OrgPlayScreen;
+        LnResultScreen;
 
 class AppRoutes {
   // Face Task
@@ -29,31 +24,31 @@ class AppRoutes {
   static const wordResult = '/word_result';
 
   // Letter–Number Task
-  static const lnIntro = '/ln-intro';
-  static const lnInstruction = '/ln-instruction';
-  static const lnPlay = '/ln-play';
-  static const lnListen = '/ln-listen';
-  static const lnInput = '/ln-input';
-  static const lnResult = '/ln-result';
+  static const lnIntro = '/ln_intro';
+  static const lnInstruction = '/ln_instruction';
+  static const lnPlay = '/ln_play';
+  static const lnListen = '/ln_listen';
+  static const lnInput = '/ln_input';
+  static const lnResult = '/ln_result';
 
   // Organizational Task
-  static const orgIntro = '/org-intro';
-  static const orgInstruction = '/org-instruction';
-  static const orgPlay = '/org-play';
-  static const orgInput = '/org-input';
-  static const orgResult = '/org-result';
+  static const orgIntro = '/org_intro';
+  static const orgInstruction = '/org_instruction';
+  static const orgPlay = '/org_play';
+  static const orgInput = '/org_input';
+  static const orgResult = '/org_result';
 
-  static const wordRecallIntro = '/word-recall-intro';
-  static const wordRecallInstruction = '/word-recall-instruction';
-  static const wordRecallInput = '/word-recall-input';
-  static const wordRecallResult = '/word-recall-result';
+  static const wordRecallIntro = '/word_recall_intro';
+  static const wordRecallInstruction = '/word_recall_instruction';
+  static const wordRecallInput = '/word_recall_input';
+  static const wordRecallResult = '/word_recall_result';
 
-  static const codingIntro = '/coding-intro';
-  static const codingPractice = '/coding-practice';
-  static const codingAssessment = '/coding-assessment';
-  static const codingRealText = '/coding-real-text';
+  static const codingIntro = '/coding_intro';
+  static const codingPractice = '/coding_practice';
+  static const codingAssessment = '/coding_assessment';
+  static const codingRealText = '/coding_real_text';
 
-  static const finalMcatResult = '/final-mcat-result';
+  static const finalMcatResult = '/final_mcat_result';
 }
 
 class RouteArgs {

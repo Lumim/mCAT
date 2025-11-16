@@ -20,6 +20,7 @@ dependencies:
   audioplayers: ^5.2.1 
   flutter_tts: ^3.8.3
   speech_to_text: ^7.3.0
+  stts: ^1.2.6
   
   # Storage & Database
   hive: ^2.2.3

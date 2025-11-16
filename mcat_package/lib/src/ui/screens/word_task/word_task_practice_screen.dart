@@ -36,6 +36,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
   }
 
   Future<void> _playWords() async {
+    await _stop();
     setState(() => speaking = true);
     for (final word in widget.words.take(3)) {
       await _tts.speak(word);

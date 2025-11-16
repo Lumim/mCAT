@@ -1,51 +1,76 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:stts/stts.dart' as stts;
 
 /// ---------------------------------------------------------------------------
-/// Continuous 20-second Speech-to-Text Service for mCAT
-/// Keeps restarting when Android STT stops early
+/// Continuous 20-second Speech-to-Text Service for mCAT (stts version)
+/// Keeps restarting when STT stops early
 /// ---------------------------------------------------------------------------
 class SttService {
-  final stt.SpeechToText _speech = stt.SpeechToText();
+  final stts.Stt _speech = stts.Stt();
 
   bool _isReady = false;
   bool _isListening = false;
   bool _shouldContinue = false;
 
-  String _localeId = 'en_US';
+  String _localeId = 'en-US';
   String _collectedText = '';
 
   Timer? _sessionTimer;
 
+  StreamSubscription<stts.SttRecognition>? _resultSub;
+  StreamSubscription<stts.SttState>? _stateSub;
+
   bool get isListening => _isListening;
   String get collectedText => _collectedText;
 
+  /// ---------------------------------------------
+  /// INIT
+  /// ---------------------------------------------
   Future<void> init() async {
     if (_isReady) return;
-    final available = await _speech.initialize(
-      onStatus: _onStatus,
-      onError: _onError,
-      debugLogging: kDebugMode,
-    );
-    if (!available) {
-      throw Exception('Speech recognition not available on this device.');
+
+    final hasPermission = await _speech.hasPermission();
+    if (!hasPermission) {
+      throw Exception('Speech permission not granted.');
     }
 
+    final supported = await _speech.isSupported();
+    if (!supported) {
+      throw Exception('Speech recognition not supported.');
+    }
+
+    // try to detect language
     try {
-      final sys = await _speech.systemLocale();
-      _localeId = sys?.localeId ??
-          _normalizeLocale(ui.PlatformDispatcher.instance.locale);
+      final lang = await _speech.getLanguage();
+      if (lang.isNotEmpty) {
+        _localeId = lang;
+      } else {
+        _localeId = _normalizeLocale(ui.PlatformDispatcher.instance.locale);
+        await _speech.setLanguage(_localeId);
+      }
     } catch (_) {
       _localeId = _normalizeLocale(ui.PlatformDispatcher.instance.locale);
+      try {
+        await _speech.setLanguage(_localeId);
+      } catch (_) {}
     }
 
+    // listen to STT start/stop events
+    _stateSub = _speech.onStateChanged.listen(
+      (state) => _onStatus(state.name),
+      onError: _onError,
+    );
+
     _isReady = true;
+
     if (kDebugMode) debugPrint('🎙️ STT ready (locale: $_localeId)');
   }
 
-  /// Seamless listening for [durationSeconds] total
+  /// ---------------------------------------------
+  /// START 20-second CONTINUOUS LISTENING
+  /// ---------------------------------------------
   Future<void> startListening({
     required void Function(String text) onPartialResult,
     required void Function(String text) onFinalResult,
@@ -58,10 +83,11 @@ class SttService {
     _shouldContinue = true;
     _isListening = true;
 
-    if (kDebugMode)
-      debugPrint('🎧 Starting seamless $durationSeconds s session');
+    if (kDebugMode) {
+      debugPrint('🎧 Starting seamless $durationSeconds s STT session...');
+    }
 
-    // stop everything after 20 s total
+    // stop after total duration
     _sessionTimer?.cancel();
     _sessionTimer = Timer(Duration(seconds: durationSeconds), () async {
       _shouldContinue = false;
@@ -72,45 +98,60 @@ class SttService {
     _listenCycle(onPartialResult, onFinalResult);
   }
 
-  /// one recognition cycle; restarted automatically
+  /// ---------------------------------------------
+  /// ONE LISTENING CYCLE
+  /// ---------------------------------------------
   Future<void> _listenCycle(
     void Function(String text) onPartialResult,
     void Function(String text) onFinalResult,
   ) async {
     if (!_shouldContinue) return;
 
-    await _speech.listen(
-      localeId: _localeId,
-      listenMode: stt.ListenMode.dictation,
-      partialResults: true,
-      listenFor: const Duration(seconds: 20),
-      pauseFor: const Duration(seconds: 20),
-      onResult: (result) {
-        final text = result.recognizedWords.trim();
-        if (text.isEmpty) return;
+    await _resultSub?.cancel();
+    _resultSub = _speech.onResultChanged.listen((result) {
+      final text = result.text.trim();
+      if (text.isEmpty) return;
 
-        if (!_collectedText.endsWith(text)) {
-          _collectedText = '$_collectedText $text'.trim();
-        }
+      if (!_collectedText.endsWith(text)) {
+        _collectedText = '$_collectedText $text'.trim();
+      }
 
-        onPartialResult(_collectedText);
+      onPartialResult(_collectedText);
 
-        if (result.finalResult) {
-          if (kDebugMode) debugPrint('✅ Segment: $text');
-          onFinalResult(_collectedText);
-        }
-      },
+      if (result.isFinal) {
+        if (kDebugMode) debugPrint('✅ Final segment: $text');
+        onFinalResult(_collectedText);
+      }
+    });
+
+    try {
+      await _speech.setLanguage(_localeId);
+    } catch (_) {}
+
+    await _speech.start(
+      const stts.SttRecognitionOptions(
+        punctuation: true,
+        offline: true,
+      ),
     );
   }
 
+  /// ---------------------------------------------
+  /// STATUS CALLBACKS
+  /// ---------------------------------------------
   void _onStatus(String status) {
     if (kDebugMode) debugPrint('STT status: $status');
+
     if (!_shouldContinue) return;
 
-    // Android reports "done" or "notListening" after a short silence
-    if (status == 'done' || status == 'notListening') {
+    if (status == stts.SttState.start.name) {
+      _isListening = true;
+      return;
+    }
+
+    if (status == stts.SttState.stop.name) {
       _isListening = false;
-      // restart quickly to continue same 20 s session
+
       Future.delayed(const Duration(milliseconds: 200), () async {
         if (_shouldContinue && !_isListening) {
           if (kDebugMode) debugPrint('🔁 Restarting STT cycle...');
@@ -122,41 +163,54 @@ class SttService {
 
   void _onError(dynamic err) {
     if (kDebugMode) debugPrint('⚠️ STT error: $err');
+
     _isListening = false;
-    if (_shouldContinue) {
-      Future.delayed(const Duration(milliseconds: 500), () async {
-        if (_shouldContinue && !_isListening) {
-          if (kDebugMode) debugPrint('🔁 Restarting after error...');
-          await _listenCycle((_) {}, (_) {});
-        }
-      });
-    }
+
+    Future.delayed(const Duration(milliseconds: 500), () async {
+      if (_shouldContinue && !_isListening) {
+        if (kDebugMode) debugPrint('🔁 Restarting after error...');
+        await _listenCycle((_) {}, (_) {});
+      }
+    });
   }
 
+  /// ---------------------------------------------
+  /// STOP MANUALLY
+  /// ---------------------------------------------
   Future<void> stopListening() async {
     _shouldContinue = false;
     _sessionTimer?.cancel();
+
     try {
       await _speech.stop();
-    } catch (_) {
-      await _speech.cancel();
-    }
+    } catch (_) {}
+
     _isListening = false;
+    await _resultSub?.cancel();
+
     if (kDebugMode) debugPrint('🛑 Listening stopped');
   }
 
+  /// ---------------------------------------------
+  /// DISPOSE
+  /// ---------------------------------------------
   void dispose() {
     _shouldContinue = false;
     _sessionTimer?.cancel();
+    _resultSub?.cancel();
+    _stateSub?.cancel();
     try {
-      _speech.cancel();
+      _speech.dispose();
     } catch (_) {}
   }
 
+  /// ---------------------------------------------
+  /// NORMALIZE LOCALE
+  /// ---------------------------------------------
   String _normalizeLocale(ui.Locale locale) {
     final lang = locale.languageCode.isNotEmpty ? locale.languageCode : 'en';
     final country =
-        (locale.countryCode ?? '').isNotEmpty ? locale.countryCode : 'US';
-    return '${lang}_$country';
+        (locale.countryCode ?? '').isNotEmpty ? locale.countryCode! : 'US';
+    return '$lang-$country'; // stts uses dash format
   }
 }
