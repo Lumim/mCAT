@@ -17,50 +17,63 @@ class _LnListenScreenState extends State<LnListenScreen> {
   final SttService _stt = SttService();
   String recognized = '';
   bool listening = false;
-  Timer? _safetyTimer;
+  Timer? _timer;
+  bool _completed = false;
 
   @override
   void initState() {
     super.initState();
-    _start();
+    _stt.init();
+    _startListening();
   }
 
-  Future<void> _start() async {
-    await _stt.init();
-    // print('the number is: ${widget.toString()}');
+  Future<void> _startListening() async {
     setState(() {
       listening = true;
       recognized = '';
+      _completed = false;
     });
 
-    // This await might complete BEFORE you create the safety timer
+    _startTimer();
+
     await _stt.startListening(
-      durationSeconds: 10,
+      durationSeconds: 15,
       onPartialResult: (text) {
         if (!mounted) return;
         setState(() => recognized = text);
       },
-      onFinalResult: (finalText) async {
+      onFinalResult: (finalText) {
         if (!mounted) return;
-        setState(() {
-          recognized = finalText;
-          listening = false;
-        });
-        await _finishAndRoute(); // This stops everything
+        setState(() => recognized = finalText);
+        // Don't auto-navigate on final result, let timer handle it
       },
     );
-
-    // Safety timer is created AFTER stt.startListening might have already finished
-
-    _safetyTimer = Timer(const Duration(seconds: 11), () async {
-      if (!mounted) return;
-      await _finishAndRoute();
-    });
   }
 
-  Future<void> _finishAndRoute() async {
-    _safetyTimer?.cancel();
-    await _stt.stopListening();
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer(const Duration(seconds: 15), _onTimerComplete);
+    print('Timer started for 15 seconds...');
+  }
+
+  void _onTimerComplete() {
+    print('Timer completed. Forcing navigation...');
+    _forceCompleteSession();
+  }
+
+  Future<void> _forceCompleteSession() async {
+    if (_completed) return;
+    _completed = true;
+
+    // Cancel timer first
+    _timer?.cancel();
+
+    // Dispose the STT service completely to prevent restarts
+    _stt.dispose();
+
+    if (mounted) {
+      setState(() => listening = false);
+    }
 
     // Persist this round
     await DataService().saveTask('ln_listen', {
@@ -73,23 +86,26 @@ class _LnListenScreenState extends State<LnListenScreen> {
     if (!mounted) return;
     Navigator.pushReplacementNamed(
       context,
-      '/ln-input', // hyphen route
+      '/ln_input',
       arguments: widget.controller,
     );
   }
 
+  List<String> _splitWords(String text) {
+    return text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
+  }
+
   @override
   void dispose() {
-    _safetyTimer?.cancel();
-    _stt.dispose();
+    _timer?.cancel();
+    if (!_completed) {
+      _stt.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final round = widget.controller.current;
-    final number = (round.numberSeq.isNotEmpty) ? round.numberSeq.last : 100;
-
     final roundNo = widget.controller.roundIndex + 1;
 
     return Scaffold(
@@ -112,7 +128,7 @@ class _LnListenScreenState extends State<LnListenScreen> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 24, horizontal: 48),
                 child: Text(
-                  '${widget.controller.current.numberSeq.join('')}',
+                  widget.controller.current.numberSeq.join(''),
                   style: const TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.bold,
@@ -125,11 +141,25 @@ class _LnListenScreenState extends State<LnListenScreen> {
             const SizedBox(height: 16),
             Text(
               listening
-                  ? '🎤 Listening ${_safetyTimer?.tick ?? 0} seconds... the number starts from ${widget.controller.current.numberSeq.join(',')}'
-                  : 'Recognized: ${recognized.isEmpty ? "(none)" : recognized}',
+                  ? '🎤 Listening...'
+                  : 'Recognized:${recognized.isEmpty && !listening ? "(none)" : ""}',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16),
             ),
+            const SizedBox(height: 10),
+            if (recognized.isNotEmpty)
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
+                children: _splitWords(recognized)
+                    .map(
+                      (word) => Chip(
+                        label: Text(word),
+                        backgroundColor: Colors.blue.shade50,
+                      ),
+                    )
+                    .toList(),
+              ),
             const Spacer(),
           ],
         ),

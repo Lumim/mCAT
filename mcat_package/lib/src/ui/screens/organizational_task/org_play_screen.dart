@@ -80,7 +80,7 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () => Navigator.pushReplacementNamed(
-                  context, '/org-input',
+                  context, '/org_input',
                   arguments: widget.controller),
               child: const Text('Start Typing'),
             ),

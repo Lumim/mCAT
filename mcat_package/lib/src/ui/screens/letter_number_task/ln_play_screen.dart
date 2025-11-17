@@ -41,7 +41,7 @@ class LnPlayScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacementNamed(
                   context,
-                  '/ln-listen', // hyphen route
+                  '/ln_listen', // hyphen route
                   arguments: controller,
                 );
               },

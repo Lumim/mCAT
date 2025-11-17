@@ -28,6 +28,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
   bool listening = false;
   String recognized = '';
   int score = 0;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -51,6 +52,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
   }
 
   Future<void> _startListening() async {
+    startTimer();
     setState(() => listening = true);
 
     await _stt.startListening(
@@ -59,22 +61,18 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
       },
       onFinalResult: (finalText) {
         // Triggered when user pauses for a few seconds or stops manually
-        setState(() {
-          recognized = finalText;
-          listening = false;
-          _evaluate();
-        });
+        recognized = finalText;
         debugPrint('🎤 Final recognized text: $finalText');
       },
     );
   }
 
   /// Stop the listening session
-  /* Future<void> _stop() async {
+  Future<void> _stop() async {
     await _stt.stopListening();
     setState(() => listening = false);
   }
- */
+
   void _evaluate() async {
     final spoken = recognized
         .toLowerCase()
@@ -97,11 +95,36 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
     widget.onFinished(score, widget.words.length);
   }
 
+  List<String> _splitWords(String text) {
+    return text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
+  }
+
   @override
   void dispose() {
     _tts.dispose();
     _stt.dispose();
     super.dispose();
+  }
+
+  void startTimer() {
+    // Cancel existing timer if any
+    _timer?.cancel();
+
+    // Start new timer
+    _timer = Timer(const Duration(seconds: 20), _onTimerComplete);
+
+    print('Timer started for 20 seconds...');
+  }
+
+  void _onTimerComplete() {
+    print('Timer completed. Stopping listening...');
+    if (listening) {
+      _stop();
+      setState(() {
+        listening = false;
+        _evaluate();
+      });
+    }
   }
 
   @override
@@ -116,6 +139,11 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
             const Text(
               'Listen carefully and repeat all the words you hear.',
               textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+            const Text(
+              'Listen carefully and repeat all the words you hear.',
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 20),
@@ -124,9 +152,24 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
             Text(
               listening
                   ? '🎤 Listening...'
-                  : 'You said: ${recognized.isEmpty ? "(none)" : recognized}',
+                  : 'Your words are: ${recognized.isEmpty && !listening ? "(none)" : ""}',
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 10),
+            if (recognized.isNotEmpty)
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
+                children: _splitWords(recognized)
+                    .map(
+                      (word) => Chip(
+                        label: Text(word),
+                        backgroundColor: Colors.blue.shade50,
+                      ),
+                    )
+                    .toList(),
+              ),
             const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

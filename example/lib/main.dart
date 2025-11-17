@@ -62,7 +62,7 @@ class _McatAppState extends State<McatApp> {
         builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () =>
-              Navigator.of(navContext).pushNamed(AppRoutes.wordIntro),
+              Navigator.of(navContext).pushNamed(AppRoutes.lnInstruction),
         ),
       ),
 

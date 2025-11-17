@@ -25,7 +25,7 @@ class LnInstructionScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacementNamed(
                   context,
-                  '/ln-play', // hyphen route
+                  '/ln_play', // hyphen route
                   arguments: controller,
                 );
               },

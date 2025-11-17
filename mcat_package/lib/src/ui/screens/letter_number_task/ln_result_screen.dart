@@ -25,7 +25,7 @@ class LnResultScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Navigator.pushReplacementNamed(
                 context,
-                '/org-intro', // hyphen route
+                '/org_intro', // hyphen route
               ),
               child: const Text('Done'),
             ),

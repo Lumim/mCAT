@@ -47,7 +47,7 @@ class _LnInputScreenState extends State<LnInputScreen> {
       if (!mounted) return;
       Navigator.pushReplacementNamed(
         context,
-        '/ln-play', // hyphen route
+        '/ln_play', // hyphen route
         arguments: widget.controller,
       );
     } else {
@@ -55,7 +55,7 @@ class _LnInputScreenState extends State<LnInputScreen> {
       if (!mounted) return;
       Navigator.pushReplacementNamed(
         context,
-        '/ln-result', // hyphen route
+        '/ln_result', // hyphen route
         arguments: widget.controller,
       );
     }

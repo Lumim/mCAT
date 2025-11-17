@@ -40,10 +40,10 @@ class _OrgInputScreenState extends State<OrgInputScreen> {
   void _next() {
     if (!widget.controller.isLast) {
       widget.controller.nextRound();
-      Navigator.pushReplacementNamed(context, '/org-play',
+      Navigator.pushReplacementNamed(context, '/org_play',
           arguments: widget.controller);
     } else {
-      Navigator.pushReplacementNamed(context, '/org-result',
+      Navigator.pushReplacementNamed(context, '/org_result',
           arguments: widget.controller);
     }
   }
@@ -103,7 +103,7 @@ class _OrgInputScreenState extends State<OrgInputScreen> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pushReplacementNamed(
-                        context, '/org-play',
+                        context, '/org_play',
                         arguments: widget.controller),
                     child: const Text('Hear Again'),
                   ),

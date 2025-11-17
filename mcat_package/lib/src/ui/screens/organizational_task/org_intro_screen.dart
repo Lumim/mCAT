@@ -30,7 +30,7 @@ class OrgIntroScreen extends StatelessWidget {
             const Spacer(),
             ElevatedButton(
               onPressed: () => Navigator.pushReplacementNamed(
-                  context, '/org-instruction',
+                  context, '/org_instruction',
                   arguments: controller),
               child: const Text('Next'),
             ),

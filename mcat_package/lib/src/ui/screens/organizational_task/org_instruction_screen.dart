@@ -30,7 +30,7 @@ class OrgInstructionScreen extends StatelessWidget {
             const Spacer(),
             ElevatedButton(
               onPressed: () => Navigator.pushReplacementNamed(
-                  context, '/org-play',
+                  context, '/org_play',
                   arguments: controller),
               child: const Text('Start Assessment'),
             ),
