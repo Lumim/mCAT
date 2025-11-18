@@ -14,7 +14,7 @@ class LnRound {
     required int letters,
   }) {
     final rand = Random();
-    final numberSeq = List<int>.generate(digits, (_) => rand.nextInt(9) + 1);
+    final numberSeq = List<int>.generate(digits, (_) => rand.nextInt(9) + 7);
     final letterSeq = List<String>.generate(
       letters,
       (_) => String.fromCharCode(rand.nextInt(26) + 65), // A–Z

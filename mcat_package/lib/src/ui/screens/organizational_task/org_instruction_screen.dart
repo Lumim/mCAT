@@ -10,7 +10,7 @@ class OrgInstructionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Instructions', activeStep: 2),
+      appBar: const HeaderBar(title: 'Instructions', activeStep: 4),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

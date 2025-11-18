@@ -34,7 +34,7 @@ class _McatAppState extends State<McatApp> {
   Widget build(BuildContext context) {
     final controller = LnController([
       LnRound.generate(level: 1, digits: 1, letters: 3),
-      LnRound.generate(level: 2, digits: 2, letters: 4),
+      LnRound.generate(level: 2, digits: 1, letters: 4),
       LnRound.generate(level: 3, digits: 2, letters: 5),
     ]);
     final orgController = OrgController([
@@ -62,7 +62,7 @@ class _McatAppState extends State<McatApp> {
         builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () =>
-              Navigator.of(navContext).pushNamed(AppRoutes.lnInstruction),
+              Navigator.of(navContext).pushNamed(AppRoutes.faceIntro),
         ),
       ),
 
@@ -74,7 +74,7 @@ class _McatAppState extends State<McatApp> {
               builder: (context) => FaceTaskIntroScreen(
                 onNext: () =>
                     //  Navigator.of(context).pushNamed(AppRoutes.facePractice),
-                    Navigator.of(context).pushNamed(AppRoutes.lnResult),
+                    Navigator.of(context).pushNamed(AppRoutes.facePractice),
               ),
             );
 

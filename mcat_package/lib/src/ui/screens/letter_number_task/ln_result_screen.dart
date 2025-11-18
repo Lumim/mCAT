@@ -10,7 +10,7 @@ class LnResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Results', activeStep: 4),
+      appBar: const HeaderBar(title: 'Results', activeStep: 3),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

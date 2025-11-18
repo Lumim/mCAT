@@ -56,7 +56,7 @@ class _OrgInputScreenState extends State<OrgInputScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
       appBar: HeaderBar(
-          title: 'Organizational – Round $roundNo/$total', activeStep: 3),
+          title: 'Organizational – Round $roundNo/$total', activeStep: 4),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

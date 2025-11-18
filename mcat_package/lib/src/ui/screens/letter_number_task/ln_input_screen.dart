@@ -37,7 +37,8 @@ class _LnInputScreenState extends State<LnInputScreen> {
     // Optional: persist per-round input
     await DataService().saveTask('ln_input', {
       'round': widget.controller.roundIndex + 1,
-      'value': calculatedScore,
+      'score': calculatedScore,
+      'total': widget.controller.current.letterSeq.length,
       'timestamp': DateTime.now().toIso8601String(),
     });
 

@@ -11,8 +11,25 @@ class TtsService {
     print('✅ TTS initialized');
   }
 
+  // Add completion handler support
+  void setCompletionHandler(Function handler) {
+    _tts.setCompletionHandler(() {
+      handler();
+    });
+  }
+
+  void setErrorHandler(Function(String) handler) {
+    _tts.setErrorHandler((msg) {
+      handler(msg);
+    });
+  }
+
   Future<void> speak(String text) async {
     await _tts.speak(text);
+  }
+
+  Future<void> stop() async {
+    await _tts.stop();
   }
 
   void dispose() {

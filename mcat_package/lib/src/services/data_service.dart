@@ -15,13 +15,31 @@ class DataService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String? _deviceId;
 
+  // ✅ ADD: Performance optimizations
+  final _syncQueue = <TaskRecord>[];
+  Timer? _syncTimer;
+  bool _isSyncing = false;
+  Completer<void>? _initCompleter;
+
   Future<void> init() async {
-    if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(TaskRecordAdapter());
-    _box = await Hive.openBox<TaskRecord>(_boxName);
-    ConnectivityService().startListening(_syncIfOnline);
+    if (_initCompleter != null) return _initCompleter!.future;
+
+    _initCompleter = Completer<void>();
+
+    try {
+      if (!Hive.isAdapterRegistered(1)) {
+        Hive.registerAdapter(TaskRecordAdapter());
+      }
+      _box = await Hive.openBox<TaskRecord>(_boxName);
+      ConnectivityService().startListening(_syncIfOnline);
+      _initCompleter!.complete();
+    } catch (e) {
+      _initCompleter!.completeError(e);
+      rethrow;
+    }
   }
 
-  // Get or create persistent device ID
+  // ✅ OPTIMIZED: Get or create persistent device ID (cached)
   Future<String> get _getDeviceId async {
     _deviceId ??= await _getOrCreateDeviceId();
     return _deviceId!;
@@ -33,35 +51,92 @@ class DataService {
 
     if (storedId == null) {
       storedId = 'device_${DateTime.now().millisecondsSinceEpoch}';
-      await prefs.setString('device_id', storedId);
+      unawaited(prefs.setString('device_id', storedId)); // Don't await
     }
 
     return storedId;
   }
 
-  // Generate unique key for device + task type combination
   String _generateKey(String deviceId, String taskType) {
     return '${deviceId}_$taskType';
   }
 
-  // ✅ MAIN METHOD: Save or update task data
+  // ✅ OPTIMIZED: Save task without blocking UI
   Future<void> saveTask(String taskType, Map<String, dynamic> data) async {
+    // Ensure initialization is complete
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+    }
+
     final deviceId = await _getDeviceId;
     final key = _generateKey(deviceId, taskType);
 
     final record = TaskRecord(
-      id: key, // Use composite key as ID
+      id: key,
       taskType: taskType,
       timestamp: DateTime.now(),
       data: data,
     );
 
-    await _box.put(key, record); // Auto creates or updates
-    await _syncIfOnline();
+    // ✅ FAST: Save to Hive immediately (local storage is quick)
+    await _box.put(key, record);
+
+    // ✅ OPTIMIZED: Queue for Firebase sync (non-blocking)
+    _queueForSync(record);
+
+    return; // Return immediately without waiting for sync
+  }
+
+  // ✅ NEW: Queue system for Firebase syncs
+  void _queueForSync(TaskRecord record) {
+    _syncQueue.add(record);
+
+    // Debounce sync calls - wait for multiple saves
+    _syncTimer?.cancel();
+    _syncTimer = Timer(const Duration(milliseconds: 1000), _processSyncQueue);
+  }
+
+  // ✅ NEW: Process sync queue in background
+  Future<void> _processSyncQueue() async {
+    if (_isSyncing || _syncQueue.isEmpty) return;
+
+    _isSyncing = true;
+    final online = await ConnectivityService().isConnected();
+
+    if (!online) {
+      _isSyncing = false;
+      return;
+    }
+
+    final recordsToSync = List<TaskRecord>.from(_syncQueue);
+    _syncQueue.clear();
+
+    try {
+      // ✅ OPTIMIZED: Use batch write for multiple records
+      final batch = _firestore.batch();
+
+      for (final record in recordsToSync) {
+        final docRef = _firestore.collection('mcat_results').doc(record.id);
+        batch.set(docRef, record.toJson());
+      }
+
+      await batch.commit();
+      print('✅ Synced ${recordsToSync.length} records to Firebase');
+    } catch (e) {
+      print('❌ Sync error: $e');
+      // Re-add failed records to queue for retry
+      _syncQueue.addAll(recordsToSync);
+    } finally {
+      _isSyncing = false;
+    }
   }
 
   // Get task data for current device
   Future<TaskRecord?> getTask(String taskType) async {
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+    }
+
     final deviceId = await _getDeviceId;
     final key = _generateKey(deviceId, taskType);
     return _box.get(key);
@@ -69,6 +144,10 @@ class DataService {
 
   // Check if task exists for current device
   Future<bool> hasTask(String taskType) async {
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+    }
+
     final deviceId = await _getDeviceId;
     final key = _generateKey(deviceId, taskType);
     return _box.containsKey(key);
@@ -76,6 +155,10 @@ class DataService {
 
   // Get all records for current device
   Future<List<TaskRecord>> getAllRecords() async {
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+    }
+
     final deviceId = await _getDeviceId;
     return _box.values
         .where((record) => record.id.startsWith(deviceId))
@@ -84,34 +167,56 @@ class DataService {
   }
 
   // Get all records (including from other devices if any)
-  Future<List<TaskRecord>> getAllRecordsAllDevices() async =>
-      _box.values.toList().cast<TaskRecord>();
+  Future<List<TaskRecord>> getAllRecordsAllDevices() async {
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+    }
 
+    return _box.values.toList().cast<TaskRecord>();
+  }
+
+  // ✅ OPTIMIZED: Background sync with batch operations
   Future<void> _syncIfOnline() async {
+    if (_isSyncing) return;
+
     final online = await ConnectivityService().isConnected();
     if (!online) return;
 
-    for (final record in _box.values) {
-      try {
-        await _firestore
-            .collection('mcat_results')
-            .doc(record.id) // Use the composite key as document ID
-            .set(record.toJson());
-      } catch (e) {
-        print('Sync error for record ${record.id}: $e');
-      }
+    final unsyncedRecords = _box.values
+        .where((record) => !_syncQueue.any((queued) => queued.id == record.id))
+        .toList();
+
+    if (unsyncedRecords.isNotEmpty) {
+      _syncQueue.addAll(unsyncedRecords);
+      unawaited(_processSyncQueue()); // Don't await
     }
   }
 
   // Clear all data for current device
   Future<void> clearDeviceData() async {
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+    }
+
     final deviceId = await _getDeviceId;
     final keysToDelete =
         _box.keys.where((key) => key.toString().startsWith(deviceId)).toList();
 
     await _box.deleteAll(keysToDelete);
+    _syncQueue.removeWhere((record) => record.id.startsWith(deviceId));
   }
 
   // Get device ID for debugging
   Future<String> getDeviceId() => _getDeviceId;
+
+  // ✅ NEW: Manual sync trigger
+  Future<void> forceSync() async {
+    await _processSyncQueue();
+  }
+
+  // ✅ NEW: Dispose method
+  void dispose() {
+    _syncTimer?.cancel();
+    _syncQueue.clear();
+  }
 }

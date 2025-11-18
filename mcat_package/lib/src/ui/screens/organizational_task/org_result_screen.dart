@@ -40,11 +40,10 @@ class OrgResultScreen extends StatelessWidget {
             ),
             const Spacer(),
             ElevatedButton(
-              onPressed: onNextTask ??
-                  () => Navigator.pushReplacementNamed(
-                        context,
-                        '/word-recall-intro', // hyphen route
-                      ),
+              onPressed: () => Navigator.pushReplacementNamed(
+                context,
+                '/word_recall_intro', // hyphen route
+              ),
               child: const Text('Done'),
             ),
           ],
