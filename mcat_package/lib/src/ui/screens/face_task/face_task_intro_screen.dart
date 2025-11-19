@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:mcat_package/src/services/tts_service.dart';
+//import 'package:audioplayers/audioplayers.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/header_bar.dart';
 
@@ -13,36 +14,29 @@ class FaceTaskIntroScreen extends StatefulWidget {
 
 class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
   bool _showSecond = false;
+  final TtsService _tts = TtsService();
 
-  AudioPlayer? _player; // ✅ make it nullable
   bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    _player = AudioPlayer(); // safe initialization
+    _tts.init();
   }
 
   Future<void> _togglePlay() async {
-    // ✅ guard: if player not ready yet, create one
-    _player ??= AudioPlayer();
-
-    if (_isPlaying) {
-      await _player!.pause();
-      setState(() => _isPlaying = false);
-    } else {
-      await _player!.play(AssetSource('sounds/face_1.mp3'));
-      setState(() => _isPlaying = true);
-
-      _player!.onPlayerComplete.listen((_) {
-        if (mounted) setState(() => _isPlaying = false);
-      });
-    }
+    setState(() => _isPlaying = true);
+    await _tts.speak(
+        'This will be the practice for face task. There will be 2 faces for practicing the task.'
+        'First, you will be given the option to do a practice round where you can try the test before starting the real round. When you are ready to start the practice round, you can press “start” and you will be shown the first image. Next, tap on the feeling you see in the image. Once you have tapped an emotion, get ready for the next image.');
+    // small pause feels natural
+    await Future.delayed(const Duration(milliseconds: 400));
   }
 
   @override
   void dispose() {
-    _player?.dispose();
+    if (mounted) setState(() => _isPlaying = false);
+    _tts.dispose();
     super.dispose();
   }
 
@@ -88,11 +82,12 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
             'First, you will be given the option to do a practice round '
             'where you can try the test before starting the real round.',
           ),
-          const Spacer(),
+          const Spacer(flex: 1),
           PrimaryButton(
             label: 'Next',
             onPressed: () => setState(() => _showSecond = true),
           ),
+          const SizedBox(height: 14),
         ],
       ),
     );
@@ -102,49 +97,48 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
     return Padding(
       key: key,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 16),
-          const Center(
-            child: Text(
-              'Instructions',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        const SizedBox(height: 16),
+        const Center(
+          child: Text(
+            'Instructions',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 16),
-          _infoCard(
-            'When you are ready to start the practice round, you can press '
-            '“start” and you will be shown the first image. Next, tap on the feeling '
-            'you see in the image. Once you have tapped an emotion, get ready for the next image.',
+        ),
+        const SizedBox(height: 16),
+        _infoCard(
+          'When you are ready to start the practice round, you can press '
+          '“start” and you will be shown the first image. Next, tap on the feeling '
+          'you see in the image. Once you have tapped an emotion, get ready for the next image.',
+        ),
+        const SizedBox(height: 24),
+        TextButton.icon(
+          onPressed: _togglePlay,
+          icon: Icon(
+            _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+            color: Colors.blue,
+            size: 28,
           ),
-          const SizedBox(height: 24),
-          TextButton.icon(
-            onPressed: _togglePlay,
-            icon: Icon(
-              _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+          label: Text(
+            _isPlaying ? 'Playing' : 'Hear instructions',
+            style: const TextStyle(
               color: Colors.blue,
-              size: 28,
-            ),
-            label: Text(
-              _isPlaying ? 'Pause audio' : 'Hear instructions',
-              style: const TextStyle(
-                color: Colors.blue,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const Spacer(),
-          PrimaryButton(
-            label: 'Start Assessment',
-            onPressed: widget.onNext,
-          ),
-        ],
-      ),
+        ),
+        const Spacer(),
+        !_isPlaying
+            ? PrimaryButton(
+                label: 'Start Assessment',
+                onPressed: widget.onNext,
+              )
+            : const SizedBox.shrink(),
+      ]),
     );
   }
 
@@ -164,7 +158,7 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
       ),
       child: Text(
         text,
-        style: const TextStyle(fontSize: 15, height: 1.4),
+        style: const TextStyle(fontSize: 20, height: 1.4),
         textAlign: TextAlign.center,
       ),
     );

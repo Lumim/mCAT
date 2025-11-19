@@ -117,8 +117,7 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
               showImage
                   ? 'Look at the face for 3 seconds.'
                   : 'Select the emotion you saw:',
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -128,7 +127,7 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
                   duration: const Duration(milliseconds: 300),
                   child: showImage
                       ? Column(
-                         key: ValueKey('img_$index'),
+                          key: ValueKey('img_$index'),
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Expanded(
@@ -149,9 +148,8 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
                                   alignment: Alignment.centerLeft,
                                   child: Container(
                                     height: 6,
-                                    width:
-                                        MediaQuery.of(context).size.width *
-                                            progress,
+                                    width: MediaQuery.of(context).size.width *
+                                        progress,
                                     decoration: BoxDecoration(
                                       color: Colors.blue,
                                       borderRadius: BorderRadius.circular(3),
@@ -169,10 +167,10 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
             const SizedBox(height: 12),
             if (index == widget.items.length - 1 && !showImage)
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   PrimaryButton(
-                    label: 'Finish',
+                    label: 'Next',
                     onPressed: () async {
                       await _saveResult();
                       widget.onFinished(score, widget.items.length);

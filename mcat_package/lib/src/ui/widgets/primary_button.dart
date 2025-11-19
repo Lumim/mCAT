@@ -13,8 +13,40 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final btn = ElevatedButton(onPressed: onPressed, child: Text(label));
-    if (filled) return btn;
-    return OutlinedButton(onPressed: onPressed, child: Text(label));
+    final filledStyle = ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF006BA6),
+      foregroundColor: const Color(0xFFFFFFFF), // blue
+      shape: const StadiumBorder(), // pill shape
+      padding: const EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: 32,
+      ),
+      textStyle: const TextStyle(fontSize: 14),
+    );
+    const Spacer(flex: 8);
+    final outlinedStyle = OutlinedButton.styleFrom(
+      foregroundColor: const Color(0xFFFFFFFF),
+      side: const BorderSide(color: Color(0xFFFFFFFF)),
+      shape: const StadiumBorder(),
+      padding: const EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: 32,
+      ),
+      textStyle: const TextStyle(fontSize: 14),
+    );
+
+    if (filled) {
+      return ElevatedButton(
+        onPressed: onPressed,
+        style: filledStyle,
+        child: Text(label),
+      );
+    }
+
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: outlinedStyle,
+      child: Text(label),
+    );
   }
 }
