@@ -171,6 +171,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
                 label: 'Continue',
                 onPressed: widget.onFinished,
               ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

@@ -178,6 +178,7 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
                   ),
                 ],
               ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

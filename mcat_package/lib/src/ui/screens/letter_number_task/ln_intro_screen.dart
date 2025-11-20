@@ -10,7 +10,7 @@ class LnIntroScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Letter–Number Task', activeStep: 1),
+      appBar: const HeaderBar(title: 'Letter–Number Task', activeStep: 3),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -30,6 +30,10 @@ class LnIntroScreen extends StatelessWidget {
                   arguments: controller,
                 );
               },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
+              ),
               child: const Text('Start'),
             ),
           ],

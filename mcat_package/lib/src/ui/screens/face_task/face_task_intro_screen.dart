@@ -25,12 +25,17 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
   }
 
   Future<void> _togglePlay() async {
-    setState(() => _isPlaying = true);
-    await _tts.speak(
-        'This will be the practice for face task. There will be 2 faces for practicing the task.'
-        'First, you will be given the option to do a practice round where you can try the test before starting the real round. When you are ready to start the practice round, you can press “start” and you will be shown the first image. Next, tap on the feeling you see in the image. Once you have tapped an emotion, get ready for the next image.');
+    !_isPlaying
+        ? setState(() => _isPlaying = true)
+        : setState(() => _isPlaying = false);
+    _isPlaying
+        ? await _tts.speak(
+            'This will be the practice for face task. There will be 2 faces for practicing the task.'
+            'First, you will be given the option to do a practice round where you can try the test before starting the real round. When you are ready to start the practice round, you can press “start” and you will be shown the first image. Next, tap on the feeling you see in the image. Once you have tapped an emotion, get ready for the next image.')
+        : _tts.dispose();
     // small pause feels natural
     await Future.delayed(const Duration(milliseconds: 400));
+    // if (mounted) setState(() => _isPlaying = false);
   }
 
   @override
@@ -82,12 +87,12 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
             'First, you will be given the option to do a practice round '
             'where you can try the test before starting the real round.',
           ),
-          const Spacer(flex: 1),
+          const Spacer(flex: 12),
           PrimaryButton(
             label: 'Next',
             onPressed: () => setState(() => _showSecond = true),
           ),
-          const SizedBox(height: 14),
+          const Spacer(flex: 1),
         ],
       ),
     );
@@ -131,13 +136,14 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
             ),
           ),
         ),
-        const Spacer(),
+        const Spacer(flex: 16),
         !_isPlaying
             ? PrimaryButton(
                 label: 'Start Assessment',
                 onPressed: widget.onNext,
               )
             : const SizedBox.shrink(),
+        const Spacer(flex: 2),
       ]),
     );
   }

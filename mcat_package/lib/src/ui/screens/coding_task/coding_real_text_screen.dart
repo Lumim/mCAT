@@ -10,7 +10,10 @@ class CodingRealTextScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Coding Task', activeStep: 5,),
+      appBar: const HeaderBar(
+        title: 'Coding Task',
+        activeStep: 5,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -35,9 +38,9 @@ class CodingRealTextScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'Great job on the practice round! '
-                      'Now you will move to the actual assessment. '
-                      'You will have limited time to complete as many coding problems as you can.',
+                      ' '
+                      'Now you will move to the actual coding task. '
+                      'You will have limited time to complete a total sequence of 15 coding problems.',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16, height: 1.5),
                     ),
@@ -45,8 +48,12 @@ class CodingRealTextScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const Spacer(),
+            const Spacer(
+              flex: 12,
+            ),
+            SizedBox(height: 10), // Add 10px gap
             PrimaryButton(label: 'Start Assessment', onPressed: onNext),
+            const Spacer(flex: 1),
           ],
         ),
       ),

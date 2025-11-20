@@ -23,9 +23,10 @@ class PrimaryButton extends StatelessWidget {
       ),
       textStyle: const TextStyle(fontSize: 14),
     );
-    const Spacer(flex: 8);
+
     final outlinedStyle = OutlinedButton.styleFrom(
-      foregroundColor: const Color(0xFFFFFFFF),
+      foregroundColor: const Color(0xFF006BA6),
+      backgroundColor: const Color(0xFFFFFFFF),
       side: const BorderSide(color: Color(0xFFFFFFFF)),
       shape: const StadiumBorder(),
       padding: const EdgeInsets.symmetric(

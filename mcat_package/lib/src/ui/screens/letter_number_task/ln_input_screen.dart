@@ -92,8 +92,13 @@ class _LnInputScreenState extends State<LnInputScreen> {
             const Spacer(),
             ElevatedButton(
               onPressed: _onContinue,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
+              ),
               child: const Text('Continue'),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

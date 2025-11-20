@@ -181,6 +181,7 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
                 onPressed:
                     saving ? null : () => widget.onFinished(score, total),
               ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

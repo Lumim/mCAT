@@ -68,6 +68,7 @@ class WordTaskResultScreen extends StatelessWidget {
             ),
             const Spacer(),
             PrimaryButton(label: 'Next', onPressed: onNext),
+            const SizedBox(height: 16),
           ],
         ),
       ),

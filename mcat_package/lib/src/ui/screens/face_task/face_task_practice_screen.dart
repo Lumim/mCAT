@@ -5,7 +5,7 @@ import '../../widgets/primary_button.dart';
 import '../../widgets/header_bar.dart';
 
 class FacePracticeItem {
-  final String asset;   // e.g. 'assets/images/practice/face_happy.png'
+  final String asset; // e.g. 'assets/images/practice/face_happy.png'
   final Emotion correct;
   FacePracticeItem(this.asset, this.correct);
 }
@@ -22,8 +22,7 @@ class FaceTaskPracticeScreen extends StatefulWidget {
   });
 
   @override
-  State<FaceTaskPracticeScreen> createState() =>
-      _FaceTaskPracticeScreenState();
+  State<FaceTaskPracticeScreen> createState() => _FaceTaskPracticeScreenState();
 }
 
 class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
@@ -174,14 +173,16 @@ class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
             const SizedBox(height: 12),
             if (index == widget.practiceImageAssets.length - 1 && !showImage)
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Add 10px gap
                   PrimaryButton(
                     label: 'Finish',
                     onPressed: _finishPractice,
                   ),
                 ],
               ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

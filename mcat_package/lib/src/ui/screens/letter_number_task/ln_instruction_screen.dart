@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../domain/models/letter_number_models.dart';
 import '../../widgets/header_bar.dart';
+import '../../widgets/infocard.dart';
 
 class LnInstructionScreen extends StatelessWidget {
   final LnController controller;
@@ -15,10 +16,15 @@ class LnInstructionScreen extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const Text(
-              'Review the sequence on the next screen. After that, you’ll count backwards aloud.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
+            const InfoCard(
+              text:
+                  "Now you will hear some letters and a number. This time you must count backwards out loud from the number until you are asked to type in the letters. For example, if you hear the letters ABC and then hear the number 10, you should start counting backwards out loud from 10 (10, 9, 8, 7...) until you are asked to type in the letters. Then type in the letters ABC.",
+              fontSize: 16,
+            ),
+            const SizedBox(height: 16),
+            const InfoCard(
+              text:
+                  'You must immediately start counting backwards out loud from 10, until you are asked to type in the letters. Then type in the letters ABC.',
             ),
             const Spacer(),
             ElevatedButton(
@@ -29,8 +35,13 @@ class LnInstructionScreen extends StatelessWidget {
                   arguments: controller,
                 );
               },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
+              ),
               child: const Text('Continue'),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

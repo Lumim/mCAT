@@ -84,6 +84,7 @@ class FaceTaskResultScreen extends StatelessWidget {
               label: 'Next',
               onPressed: onNext,
             ),
+            SizedBox(height: 16),
           ],
         ),
       ),

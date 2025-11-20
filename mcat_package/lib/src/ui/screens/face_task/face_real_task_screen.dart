@@ -35,8 +35,7 @@ class FaceRealTaskScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'Great job on the practice round! '
-                      'Now you will move to the actual assessment. '
+                      'Now you will move to the actual face task. '
                       'Try to remember as many faces as you can.',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16, height: 1.5),
@@ -45,8 +44,12 @@ class FaceRealTaskScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const Spacer(),
+            const Spacer(
+              flex: 12,
+            ),
+            SizedBox(height: 10), // Add 10px gap
             PrimaryButton(label: 'Start Assessment', onPressed: onNext),
+            const Spacer(flex: 1),
           ],
         ),
       ),

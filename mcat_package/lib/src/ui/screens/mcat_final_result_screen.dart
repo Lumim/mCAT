@@ -98,6 +98,7 @@ class _McatFinalResultScreenState extends State<McatFinalResultScreen> {
                     onPressed: () =>
                         Navigator.of(context).popUntil((r) => r.isFirst),
                   ),
+                  const Spacer(flex: 8),
                 ],
               ),
       ),

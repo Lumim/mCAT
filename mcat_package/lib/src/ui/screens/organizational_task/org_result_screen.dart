@@ -4,8 +4,7 @@ import '../../../domain/models/organizational_models.dart';
 
 class OrgResultScreen extends StatelessWidget {
   final OrgController controller;
-  final VoidCallback?
-      onNextTask; // e.g., to jump to the next (Organization) task flow in your app shell
+  final VoidCallback? onNextTask;
 
   const OrgResultScreen({super.key, required this.controller, this.onNextTask});
 
@@ -21,31 +20,42 @@ class OrgResultScreen extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Text('Your score',
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    Text('$score / $total',
-                        style: const TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold)),
-                  ],
+            Row(
+              children: [
+                Expanded(
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          Text('Your score',
+                              style: Theme.of(context).textTheme.titleMedium),
+                          const SizedBox(height: 8),
+                          Text('$score / $total',
+                              style: const TextStyle(
+                                  fontSize: 28, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
             const Spacer(),
             ElevatedButton(
               onPressed: () => Navigator.pushReplacementNamed(
                 context,
-                '/word_recall_intro', // hyphen route
+                '/word_recall_intro',
+              ),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
               ),
               child: const Text('Done'),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/header_bar.dart';
+import '../../widgets/infocard.dart';
 import '../../widgets/primary_button.dart';
 
 class WordRecallIntroScreen extends StatelessWidget {
@@ -23,26 +24,24 @@ class WordRecallIntroScreen extends StatelessWidget {
         child: Column(
           children: [
             const Spacer(),
-            const Icon(
+            /*  const Icon(
               Icons.library_books_outlined,
               size: 80,
               color: Colors.black54,
-            ),
+            ), */
             const SizedBox(height: 24),
-            const Text(
+            /*  const Text(
               'Word Recall Task',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
               textAlign: TextAlign.center,
-            ),
+            ), */
             const SizedBox(height: 12),
-            const Text(
-              'Earlier, in the Word Task, you heard a list of words. '
-  'Now you will be asked to recall as many of those words as you can.',
-              style: TextStyle(fontSize: 16, color: Colors.black87),
-              textAlign: TextAlign.center,
+            const InfoCard(
+              text: 'Earlier, in the Word Task, you heard a list of words. '
+                  'Now you will be asked to recall as many of those words as you can.',
             ),
             const Spacer(),
             PrimaryButton(

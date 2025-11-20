@@ -100,21 +100,18 @@ class _OrgInputScreenState extends State<OrgInputScreen> {
             const Spacer(),
             Row(
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pushReplacementNamed(
-                        context, '/org_play',
-                        arguments: widget.controller),
-                    child: const Text('Hear Again'),
-                  ),
-                ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 1),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _feedback == null ? _checkAnswer : _next,
-                    child: Text(_feedback == null ? 'CHECK ANSWER' : 'Next'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: const Color(0xFFFFFFFF),
+                      backgroundColor: const Color(0xFF006BA6),
+                    ),
+                    child: Text(_feedback == null ? 'Next' : 'Next'),
                   ),
                 ),
+                const SizedBox(height: 16),
               ],
             ),
           ],

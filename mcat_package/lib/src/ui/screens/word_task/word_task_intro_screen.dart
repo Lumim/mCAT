@@ -73,6 +73,7 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
             label: 'Next',
             onPressed: () => setState(() => _showSecond = true),
           ),
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -114,6 +115,7 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
             label: 'Start Assessment',
             onPressed: widget.onNext,
           ),
+          const SizedBox(height: 16),
         ],
       ),
     );

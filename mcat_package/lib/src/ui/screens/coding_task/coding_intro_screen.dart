@@ -36,7 +36,7 @@ class _CodingIntroScreenState extends State<CodingIntroScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-           // const StepIndicator(activeIndex: 5),
+            // const StepIndicator(activeIndex: 5),
             const SizedBox(height: 20),
             const Text('Instructions',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -59,6 +59,7 @@ class _CodingIntroScreenState extends State<CodingIntroScreen> {
             ),
             const SizedBox(height: 12),
             PrimaryButton(label: 'Start Assessment', onPressed: widget.onNext),
+            const Spacer(flex: 8),
           ],
         ),
       ),

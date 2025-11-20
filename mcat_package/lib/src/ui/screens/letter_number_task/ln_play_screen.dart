@@ -66,8 +66,13 @@ class LnPlayScreen extends StatelessWidget {
                 }
                 // Then speak
               },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
+              ),
               child: const Text('Play Letters & Numbers'),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

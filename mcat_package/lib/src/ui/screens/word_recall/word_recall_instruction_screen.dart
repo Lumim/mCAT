@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mcat_package/src/ui/widgets/infocard.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/primary_button.dart';
 
@@ -67,20 +68,18 @@ class WordRecallInstructionScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'You will now be asked to recall the words that were presented earlier '
-                    'in the Word Task. You will not hear the words again.',
-                    style: TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
+                  const InfoCard(
+                      text:
+                          'This task goes back to the words that you heard in the first task. '),
                   const SizedBox(height: 20),
                   _buildBullet(
                     Icons.volume_up_outlined,
-                    'Listen carefully. Each word is only played once.',
+                    'Do you remember the list that we went over three times earlier? In a short while you will have to repeat as many words as you remember from that list in any order.',
                   ),
                   const SizedBox(height: 12),
                   _buildBullet(
                     Icons.visibility_off_outlined,
-                    'Do not write anything down during the task.',
+                    'It is important that you speak loud and clear and that you try to avoid saying anything other than the words. Also, it is important that you make a brief pause between the words when repeating them.',
                   ),
                   const SizedBox(height: 12),
                   _buildBullet(
@@ -95,6 +94,7 @@ class WordRecallInstructionScreen extends StatelessWidget {
               label: 'Start Listening',
               onPressed: onStartListening,
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

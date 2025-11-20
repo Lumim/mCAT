@@ -32,8 +32,13 @@ class OrgInstructionScreen extends StatelessWidget {
               onPressed: () => Navigator.pushReplacementNamed(
                   context, '/org_play',
                   arguments: controller),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
+              ),
               child: const Text('Start Assessment'),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

@@ -32,6 +32,10 @@ class OrgIntroScreen extends StatelessWidget {
               onPressed: () => Navigator.pushReplacementNamed(
                   context, '/org_instruction',
                   arguments: controller),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
+              ),
               child: const Text('Next'),
             ),
           ],

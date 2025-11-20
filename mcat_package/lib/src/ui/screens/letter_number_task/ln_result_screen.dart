@@ -27,6 +27,10 @@ class LnResultScreen extends StatelessWidget {
                 context,
                 '/org_intro', // hyphen route
               ),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
+              ),
               child: const Text('Done'),
             ),
           ],

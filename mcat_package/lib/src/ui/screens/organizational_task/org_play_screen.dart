@@ -71,6 +71,10 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: _speaking ? null : _play,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: const Color(0xFFFFFFFF),
+                      backgroundColor: const Color(0xFF006BA6),
+                    ),
                     icon: const Icon(Icons.volume_up),
                     label: const Text('Play'),
                   ),
@@ -82,8 +86,13 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
               onPressed: () => Navigator.pushReplacementNamed(
                   context, '/org_input',
                   arguments: widget.controller),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF006BA6),
+              ),
               child: const Text('Start Typing'),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
