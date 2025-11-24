@@ -192,6 +192,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
                 label: 'Next',
                 onPressed: () => widget.onFinished(score, widget.words.length),
               ),
+              const SizedBox(height: 16),
           ],
         ),
       ),
