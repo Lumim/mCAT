@@ -93,12 +93,13 @@ class _McatFinalResultScreenState extends State<McatFinalResultScreen> {
                       }).toList(),
                     ),
                   ),
+                  const SizedBox(height: 10),
                   PrimaryButton(
                     label: 'Finish',
                     onPressed: () =>
                         Navigator.of(context).popUntil((r) => r.isFirst),
                   ),
-                  const Spacer(flex: 8),
+                  const SizedBox(height: 16),
                 ],
               ),
       ),

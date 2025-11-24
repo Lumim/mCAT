@@ -50,6 +50,7 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
   void _checkLetter(String input) {
     final expected = _sequence[index].letter.toUpperCase();
     if (input.trim().toUpperCase() == expected) correct++;
+
     _anim.forward(from: 0.9);
     controller.clear();
 
@@ -136,7 +137,10 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (val) {
-                  if (val.isNotEmpty) _checkLetter(val);
+                  if (val.isNotEmpty) {
+                    Future.delayed(const Duration(milliseconds: 200))
+                        .then((_) => _checkLetter(val));
+                  }
                 },
               ),
             ),

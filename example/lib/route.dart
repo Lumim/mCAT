@@ -38,16 +38,19 @@ class AppRoutes {
   static const orgInput = '/org_input';
   static const orgResult = '/org_result';
 
+  // Word Recall Task
   static const wordRecallIntro = '/word_recall_intro';
   static const wordRecallInstruction = '/word_recall_instruction';
   static const wordRecallInput = '/word_recall_input';
   static const wordRecallResult = '/word_recall_result';
 
+  // Coding Task
   static const codingIntro = '/coding_intro';
   static const codingPractice = '/coding_practice';
   static const codingAssessment = '/coding_assessment';
   static const codingRealText = '/coding_real_text';
 
+  // Final MCAT Result
   static const finalMcatResult = '/final_mcat_result';
 }
 
