@@ -59,13 +59,21 @@ class _McatAppState extends State<McatApp> {
 
       // Start at the intro screen
       home: Builder(
-        builder: (navContext) => IntroScreen(
+        builder: (navContext) => AllIntroScreen(
           tasks: tasks,
           onStart: () =>
               Navigator.of(navContext).pushNamed(AppRoutes.codingAssessment),
         ),
       ),
 
+      /*  home: Builder(
+        builder: (navContext) => IntroScreen(
+          tasks: tasks,
+          onStart: () =>
+              Navigator.of(navContext).pushNamed(AppRoutes.codingAssessment),
+        ),
+      ),
+ */
       onGenerateRoute: (settings) {
         switch (settings.name) {
           // ✅ FACE TASK FLOW

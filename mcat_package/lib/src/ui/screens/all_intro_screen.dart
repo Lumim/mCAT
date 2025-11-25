@@ -1,67 +1,30 @@
 import 'package:flutter/material.dart';
+import '../../domain/models/mcat_task.dart';
+import '../widgets/header_bar.dart';
 
-class McatHomeScreen extends StatelessWidget {
-  const McatHomeScreen({super.key});
+class AllIntroScreen extends StatelessWidget {
+  final VoidCallback? onStart;
+  final List<McatTask> tasks;
+  const AllIntroScreen({
+    super.key,
+    required this.onStart,
+    required this.tasks,
+  });
 
   @override
   Widget build(BuildContext context) {
-    const background = Color(0xFFF5F6FA);
+    const background = Color(0xFFF5F6FB);
     const primaryBlue = Color(0xFF0077B6);
     const warningYellow = Color(0xFFFFF4B8);
 
     return Scaffold(
       backgroundColor: background,
+      appBar: const HeaderBar(title: 'Welcome to mCAT', activeStep: 1),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Top bar ---------------------------------------------------------
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
-                children: [
-                  // CARP logo (simple placeholder)
-                  Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Icon(
-                          Icons.videocam_rounded,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'CARP',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  // Progress pill
-                  _CompletionChip(
-                    percent: 16.33,
-                    color: primaryBlue,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
-                      // TODO: Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              ),
-            ),
 
             // Welcome text ----------------------------------------------------
             Padding(
@@ -139,7 +102,10 @@ class McatHomeScreen extends StatelessWidget {
                     statusLabel: 'Start',
                     statusColor: primaryBlue,
                     onPressed: () {
-                      // TODO: open Face Task
+                      Navigator.pushReplacementNamed(
+                        context,
+                        '/face_intro',
+                      );
                     },
                   ),
                   McatTaskCard(
@@ -149,7 +115,10 @@ class McatHomeScreen extends StatelessWidget {
                     statusLabel: 'Completed',
                     statusColor: primaryBlue,
                     onPressed: () {
-                      // TODO: open Word Task (maybe review)
+                      Navigator.pushReplacementNamed(
+                        context,
+                        '/word_intro',
+                      );
                     },
                   ),
                   McatTaskCard(
@@ -159,7 +128,10 @@ class McatHomeScreen extends StatelessWidget {
                     statusLabel: 'Start',
                     statusColor: primaryBlue,
                     onPressed: () {
-                      // TODO: open Letter Number Task
+                      Navigator.pushReplacementNamed(
+                        context,
+                        '/ln_instruction',
+                      );
                     },
                   ),
                   McatTaskCard(
@@ -169,7 +141,10 @@ class McatHomeScreen extends StatelessWidget {
                     statusLabel: 'Start',
                     statusColor: primaryBlue,
                     onPressed: () {
-                      // TODO: open Organizational Task
+                      Navigator.pushReplacementNamed(
+                        context,
+                        '/organizational_intro',
+                      );
                     },
                   ),
                   McatTaskCard(
@@ -179,17 +154,23 @@ class McatHomeScreen extends StatelessWidget {
                     statusLabel: 'Completed',
                     statusColor: primaryBlue,
                     onPressed: () {
-                      // TODO: open Word Recall Task
+                      Navigator.pushReplacementNamed(
+                        context,
+                        '/word_recall_intro',
+                      );
                     },
                   ),
                   McatTaskCard(
                     icon: Icons.grid_view_rounded,
                     iconBackground: primaryBlue,
-                    title: 'Face Task',
+                    title: 'Codding Task',
                     statusLabel: 'Start',
                     statusColor: primaryBlue,
                     onPressed: () {
-                      // TODO: open second Face Task
+                      Navigator.pushReplacementNamed(
+                        context,
+                        '/coding_intro',
+                      );
                     },
                   ),
                   const SizedBox(height: 16),

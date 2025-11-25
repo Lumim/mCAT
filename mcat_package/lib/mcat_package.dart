@@ -8,6 +8,7 @@ export 'src/domain/models/organizational_models.dart';
 export 'src/services/data_service.dart';
 export 'src/services/connectivity_service.dart';
 export 'src/ui/screens/intro_screen.dart';
+export 'src/ui/screens/all_intro_screen.dart';
 export 'src/services/asset_provider.dart';
 
 // Face Task screens

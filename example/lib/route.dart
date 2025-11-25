@@ -10,7 +10,6 @@ import 'package:mcat_package/mcat_package.dart'
 
 class AppRoutes {
   // Face Task
-
   static const facePractice = '/face_practice';
   static const faceAssessment = '/face_assessment';
   static const faceResult = '/face_result';
