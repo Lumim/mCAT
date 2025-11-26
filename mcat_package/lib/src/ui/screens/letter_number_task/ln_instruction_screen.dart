@@ -25,6 +25,7 @@ class LnInstructionScreen extends StatelessWidget {
             const InfoCard(
               text:
                   'You must immediately start counting backwards out loud from 10, until you are asked to type in the letters. Then type in the letters ABC.',
+              fontSize: 16,
             ),
             const Spacer(),
             ElevatedButton(

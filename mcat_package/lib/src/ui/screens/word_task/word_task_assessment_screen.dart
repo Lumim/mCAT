@@ -26,6 +26,8 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
   final SttService _stt = SttService();
   bool speaking = false;
   bool listening = false;
+  bool speakButtonDisabled = true;
+  bool listenButtonDisabled = false;
   String recognized = '';
   int score = 0;
   Timer? _timer;
@@ -49,6 +51,10 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
       await Future.delayed(const Duration(seconds: 1));
     }
     setState(() => speaking = false);
+    setState(() {
+      speakButtonDisabled = false;
+      listenButtonDisabled = true;
+    });
   }
 
   Future<void> _startListening() async {
@@ -123,6 +129,8 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
       setState(() {
         listening = false;
         _evaluate();
+        speakButtonDisabled = true;
+        listenButtonDisabled = true;
       });
     }
   }
@@ -136,12 +144,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const Text(
-              'Listen carefully and repeat all the words you hear.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-            const Text(
+            Text(
               'Listen carefully and repeat all the words you hear.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
@@ -150,9 +153,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
             _micIndicator(),
             const SizedBox(height: 20),
             Text(
-              listening
-                  ? '🎤 Listening...'
-                  : 'Your words are: ${recognized.isEmpty && !listening ? "(none)" : ""}',
+              listening ? '🎤 Listening...' : '',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
@@ -172,18 +173,23 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
               ),
             const Spacer(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.volume_up),
-                  label: const Text('Play Words'),
-                  onPressed: speaking ? null : _playAllWords,
-                ),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.mic),
-                  label: const Text('Speak'),
-                  onPressed: listening ? null : _startListening,
-                ),
+                !speakButtonDisabled
+                    ? const SizedBox.shrink()
+                    : ElevatedButton.icon(
+                        icon: const Icon(Icons.volume_up),
+                        label: const Text('Play Words'),
+                        onPressed: !speakButtonDisabled ? null : _playAllWords,
+                      ),
+                !listenButtonDisabled
+                    ? const SizedBox.shrink()
+                    : ElevatedButton.icon(
+                        icon: const Icon(Icons.mic),
+                        label: const Text('Speak'),
+                        onPressed:
+                            !listenButtonDisabled ? null : _startListening,
+                      ),
               ],
             ),
             const SizedBox(height: 20),
@@ -192,7 +198,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
                 label: 'Next',
                 onPressed: () => widget.onFinished(score, widget.words.length),
               ),
-              const SizedBox(height: 16),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -205,7 +211,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
       width: listening ? 80 : 60,
       height: listening ? 80 : 60,
       decoration: BoxDecoration(
-        color: listening ? Colors.blueAccent : Colors.grey.shade400,
+        color: listening ? Colors.blueAccent : null,
         shape: BoxShape.circle,
         boxShadow: [
           if (listening)

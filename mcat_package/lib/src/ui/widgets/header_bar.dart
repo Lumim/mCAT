@@ -15,7 +15,7 @@ class HeaderBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.activeStep,
     this.totalSteps = 5,
-    this.showCloseButton = true,
+    this.showCloseButton = false,
     this.assetProvider = const PackageAssetProvider(),
     this.onClose,
   });

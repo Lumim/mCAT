@@ -92,7 +92,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
       speaking = false;
     });
     _timer?.cancel();
-    _timer = Timer(const Duration(seconds: 20), _onTimerComplete);
+    _timer = Timer(const Duration(seconds: 6), _onTimerComplete);
     print('Timer started for 20 seconds...');
   }
 

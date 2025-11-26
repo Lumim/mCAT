@@ -25,7 +25,7 @@ class _IntroScreenState extends State<IntroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Welcome', activeStep: 1),
+      appBar: const HeaderBar(title: 'Welcome to mCAT'),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (child, animation) => FadeTransition(
@@ -126,7 +126,7 @@ class _IntroScreenState extends State<IntroScreen> {
           ),
           const Spacer(),
           PrimaryButton(
-            label: 'Start Assessment',
+            label: 'Begin Assessment',
             onPressed: widget.onStart,
           ),
         ],

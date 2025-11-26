@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mcat_package/src/services/tts_service.dart';
 //import 'package:audioplayers/audioplayers.dart';
+import '../../widgets/infocard.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/header_bar.dart';
 
@@ -79,13 +80,16 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          _infoCard(
-            'This will be the practice for face task. There will be\n2 faces for practicing the task.',
+          InfoCard(
+            text:
+                'This will be the practice for face task. There will be\n2 faces for practicing the task.',
+            fontSize: 16,
           ),
           const SizedBox(height: 16),
-          _infoCard(
-            'First, you will be given the option to do a practice round '
-            'where you can try the test before starting the real round.',
+          InfoCard(
+            text: 'First, you will be given the option to do a practice round '
+                'where you can try the test before starting the real round.',
+            fontSize: 16,
           ),
           const Spacer(flex: 12),
           PrimaryButton(
@@ -114,10 +118,11 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        _infoCard(
-          'When you are ready to start the practice round, you can press '
-          '“start” and you will be shown the first image. Next, tap on the feeling '
-          'you see in the image. Once you have tapped an emotion, get ready for the next image.',
+        InfoCard(
+          text: 'When you are ready to start the practice round, you can press '
+              '“start” and you will be shown the first image. Next, tap on the feeling '
+              'you see in the image. Once you have tapped an emotion, get ready for the next image.',
+          fontSize: 16,
         ),
         const SizedBox(height: 24),
         TextButton.icon(
@@ -145,28 +150,6 @@ class _FaceTaskIntroScreenState extends State<FaceTaskIntroScreen> {
             : const SizedBox.shrink(),
         const Spacer(flex: 2),
       ]),
-    );
-  }
-
-  Widget _infoCard(String text) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 20, height: 1.4),
-        textAlign: TextAlign.center,
-      ),
     );
   }
 }

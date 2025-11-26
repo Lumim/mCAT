@@ -35,7 +35,8 @@ class _LnInputScreenState extends State<LnInputScreen> {
     print('Calculated Score: ${calculatedScore.toString()}');
 
     // Optional: persist per-round input
-    await DataService().saveTask('ln_input', {
+    await DataService()
+        .saveTask('ln_input${widget.controller.roundIndex + 1}', {
       'round': widget.controller.roundIndex + 1,
       'score': calculatedScore,
       'total': widget.controller.current.letterSeq.length,

@@ -17,16 +17,14 @@ class LnResultScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 12),
             const Text(
-              'Great job! Your responses were recorded.',
+              'Great job! Your responses were recorded.'
+              'Your score saved successfully.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
             const Spacer(),
             ElevatedButton(
-              onPressed: () => Navigator.pushReplacementNamed(
-                context,
-                '/org_intro', // hyphen route
-              ),
+              onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
               style: ElevatedButton.styleFrom(
                 foregroundColor: const Color(0xFFFFFFFF),
                 backgroundColor: const Color(0xFF006BA6),

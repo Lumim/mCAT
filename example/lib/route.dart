@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mcat_package/mcat_package.dart'
     show
-        LnIntroScreen,
-        LnInstructionScreen,
         LnController,
-        LnPlayScreen,
+        LnInstructionScreen,
+        LnIntroScreen,
         LnListenScreen,
+        LnPlayScreen,
         LnResultScreen;
 
 class AppRoutes {
@@ -48,6 +48,7 @@ class AppRoutes {
   static const codingPractice = '/coding_practice';
   static const codingAssessment = '/coding_assessment';
   static const codingRealText = '/coding_real_text';
+  static const allIntroScreen = '/all_intro_screen';
 
   // Final MCAT Result
   static const finalMcatResult = '/final_mcat_result';

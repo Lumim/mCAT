@@ -2,11 +2,21 @@ import 'package:flutter/material.dart';
 import '../../widgets/header_bar.dart';
 import '../../../domain/models/organizational_models.dart';
 
+import 'package:mcat_package/src/services/data_service.dart';
+
 class OrgResultScreen extends StatelessWidget {
   final OrgController controller;
   final VoidCallback? onNextTask;
 
   const OrgResultScreen({super.key, required this.controller, this.onNextTask});
+  void saveState() async {
+    await DataService().saveTask('organizational_task', {
+      'correct': controller.correctCount,
+      'total': controller.totalRounds,
+      'accuracy': controller.correctCount / controller.totalRounds,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +55,10 @@ class OrgResultScreen extends StatelessWidget {
             ),
             const Spacer(),
             ElevatedButton(
-              onPressed: () => Navigator.pushReplacementNamed(
-                context,
-                '/word_recall_intro',
-              ),
+              onPressed: () {
+                saveState();
+                Navigator.of(context).popUntil((r) => r.isFirst);
+              },
               style: ElevatedButton.styleFrom(
                 foregroundColor: const Color(0xFFFFFFFF),
                 backgroundColor: const Color(0xFF006BA6),

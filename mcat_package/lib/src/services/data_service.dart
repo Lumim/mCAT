@@ -39,7 +39,7 @@ class DataService {
     }
   }
 
-  // ✅ OPTIMIZED: Get or create persistent device ID (cached)
+  // OPTIMIZED: Get or create persistent device ID (cached)
   Future<String> get _getDeviceId async {
     _deviceId ??= await _getOrCreateDeviceId();
     return _deviceId!;
@@ -123,7 +123,7 @@ class DataService {
       await batch.commit();
       print('✅ Synced ${recordsToSync.length} records to Firebase');
     } catch (e) {
-      print('❌ Sync error: $e');
+      print('xError Sync error: $e');
       // Re-add failed records to queue for retry
       _syncQueue.addAll(recordsToSync);
     } finally {

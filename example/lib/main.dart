@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'package:mcat_package/mcat_package.dart';
+import 'firebase_options.dart';
 import './route.dart';
 import 'mcat_settings.dart';
 
@@ -59,10 +59,10 @@ class _McatAppState extends State<McatApp> {
 
       // Start at the intro screen
       home: Builder(
-        builder: (navContext) => AllIntroScreen(
+        builder: (navContext) => IntroScreen(
           tasks: tasks,
           onStart: () =>
-              Navigator.of(navContext).pushNamed(AppRoutes.codingAssessment),
+              Navigator.of(navContext).pushNamed(AppRoutes.allIntroScreen),
         ),
       ),
 
@@ -77,6 +77,15 @@ class _McatAppState extends State<McatApp> {
       onGenerateRoute: (settings) {
         switch (settings.name) {
           // ✅ FACE TASK FLOW
+
+          case AppRoutes.allIntroScreen:
+            return MaterialPageRoute(
+              builder: (_) => AllIntroScreen(
+                tasks: tasks,
+                onStart: () => Navigator.of(context).popUntil((r) => r.isFirst),
+              ),
+            );
+
           case AppRoutes.faceIntro:
             return MaterialPageRoute(
               builder: (context) => FaceTaskIntroScreen(
@@ -157,7 +166,7 @@ class _McatAppState extends State<McatApp> {
                 score: _lastScore,
                 total: _lastTotal,
                 onNext: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.wordIntro),
+                    Navigator.of(context).pushNamed(AppRoutes.allIntroScreen),
               ),
             );
 
@@ -202,7 +211,7 @@ class _McatAppState extends State<McatApp> {
                 score: _lastScore,
                 total: _lastTotal,
                 onNext: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.lnInstruction),
+                    Navigator.of(context).pushNamed(AppRoutes.allIntroScreen),
               ),
             );
 
@@ -284,9 +293,8 @@ class _McatAppState extends State<McatApp> {
               return MaterialPageRoute(
                 builder: (_) => OrgResultScreen(
                   controller: orgCltr,
-                  onNextTask: () => Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.finalMcatResult),
+                  onNextTask: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.allIntroScreen),
                 ),
               );
             }
@@ -332,7 +340,7 @@ class _McatAppState extends State<McatApp> {
                 correct: _lastScore,
                 total: _lastTotal,
                 onNext: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.codingIntro),
+                    Navigator.of(context).pushNamed(AppRoutes.allIntroScreen),
                 // or finalMcatResult or whatever is your next task
               ),
             );
@@ -365,7 +373,7 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => CodingAssessmentScreen(
                 onFinish: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.finalMcatResult),
+                    Navigator.of(context).pushNamed(AppRoutes.allIntroScreen),
               ),
             );
 

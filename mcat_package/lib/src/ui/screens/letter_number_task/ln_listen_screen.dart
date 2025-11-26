@@ -37,7 +37,7 @@ class _LnListenScreenState extends State<LnListenScreen> {
     _startTimer();
 
     await _stt.startListening(
-      durationSeconds: 15,
+      durationSeconds: 10,
       onPartialResult: (text) {
         if (!mounted) return;
         setState(() => recognized = text);
@@ -52,7 +52,7 @@ class _LnListenScreenState extends State<LnListenScreen> {
 
   void _startTimer() {
     _timer?.cancel();
-    _timer = Timer(const Duration(seconds: 15), _onTimerComplete);
+    _timer = Timer(const Duration(seconds: 10), _onTimerComplete);
     print('Timer started for 15 seconds...');
   }
 

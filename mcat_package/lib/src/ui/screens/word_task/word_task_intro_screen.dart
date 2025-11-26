@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../../widgets/header_bar.dart';
+import '../../widgets/infocard.dart';
 import '../../widgets/primary_button.dart';
 
 class WordTaskIntroScreen extends StatefulWidget {
@@ -64,10 +65,10 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
           const Text('Instructions',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
-          _infoCard(
-            'This is a test where you’ll hear a series of words. '
-            'Repeat each word clearly into the microphone when prompted.',
-          ),
+          InfoCard(
+              text: 'This is a test where you’ll hear a series of words. '
+                  'Repeat each word clearly into the microphone when prompted.',
+              fontSize: 16),
           const Spacer(),
           PrimaryButton(
             label: 'Next',
@@ -89,11 +90,11 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
           const Text('Instructions',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
-          _infoCard(
-            'When you’re ready, press “Start Assessment”. '
-            'You’ll hear a list of words—repeat each one aloud. '
-            'Your responses will be analyzed using speech recognition.',
-          ),
+          InfoCard(
+              text: 'When you’re ready, press “Start Assessment”. '
+                  'You’ll hear a list of words—repeat each one aloud. '
+                  'Your responses will be analyzed using speech recognition.',
+              fontSize: 16),
           const SizedBox(height: 24),
           TextButton.icon(
             onPressed: _toggleAudio,
@@ -111,29 +112,15 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
             ),
           ),
           const Spacer(),
-          PrimaryButton(
-            label: 'Start Assessment',
-            onPressed: widget.onNext,
-          ),
+          !_isPlaying
+              ? PrimaryButton(
+                  label: 'Start Assessment',
+                  onPressed: widget.onNext,
+                )
+              : const SizedBox.shrink(),
           const SizedBox(height: 16),
         ],
       ),
-    );
-  }
-
-  Widget _infoCard(String text) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-        ],
-      ),
-      child: Text(text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 15, height: 1.4)),
     );
   }
 }
