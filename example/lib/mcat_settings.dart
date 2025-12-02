@@ -3,7 +3,7 @@ import 'dart:ui';
 class McatSettings {
   McatSettings._();
 
- static const String appName = "mCAT Example App";
+  static const String appName = "mCAT Example App";
 
   static const String appVersion = "1.0.0";
   // English (UK) word list
@@ -35,8 +35,7 @@ class McatSettings {
   ];
 
   /// Get the device locale (e.g., en_GB, da_DK)
-  static Locale get deviceLocale =>
-      PlatformDispatcher.instance.locale;
+  static Locale get deviceLocale => PlatformDispatcher.instance.locale;
 
   /// Normalize to app locale (we only support en_GB and da_DK here)
   static Locale get appLocale {
@@ -67,6 +66,4 @@ class McatSettings {
     if (l.languageCode == 'da') return 'Ordgenkaldelse';
     return 'Word Recall';
   }
-
-  
 }

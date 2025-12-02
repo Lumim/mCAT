@@ -73,7 +73,7 @@ class _McatAppState extends State<McatApp> {
               Navigator.of(navContext).pushNamed(AppRoutes.codingAssessment),
         ),
       ),
- */
+      */
       onGenerateRoute: (settings) {
         switch (settings.name) {
           // ✅ FACE TASK FLOW
