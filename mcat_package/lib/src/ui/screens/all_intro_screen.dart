@@ -258,7 +258,7 @@ class _AllIntroScreenState extends State<AllIntroScreen> {
                           !wordCompleted
                               ? Navigator.pushReplacementNamed(
                                   context,
-                                  '/word_assessment',
+                                  '/word_intro',
                                 )
                               : null;
                         },

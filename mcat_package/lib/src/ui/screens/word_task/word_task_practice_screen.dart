@@ -26,6 +26,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
   bool speaking = false;
   bool listening = false;
   String recognized = '';
+  bool hasPlayed = false;
 
   Timer? _timer;
 
@@ -42,15 +43,18 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
     setState(() {
       listening = false;
       speaking = true;
+      hasPlayed = true;
     });
+    
     for (final word in widget.words.take(3)) {
       await _tts.speak(word);
       await Future.delayed(const Duration(seconds: 1));
     }
+    
     setState(() => speaking = false);
   }
 
-  Future<void> _start() async {
+  Future<void> _startListening() async {
     startTimer();
     setState(() {
       listening = true;
@@ -88,12 +92,11 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
 
   void startTimer() {
     setState(() {
-      //listening = false;
       speaking = false;
     });
     _timer?.cancel();
     _timer = Timer(const Duration(seconds: 6), _onTimerComplete);
-    print('Timer started for 20 seconds...');
+    print('Timer started for 6 seconds...');
   }
 
   void _onTimerComplete() {
@@ -116,7 +119,7 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
         child: Column(
           children: [
             const Text(
-              'Let`s practice.',
+              'Let\'s practice.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
@@ -131,7 +134,9 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
             Text(
               listening
                   ? '🎤 Listening...'
-                  : 'Your words are: ${recognized.isEmpty && !listening ? "(none)" : ""}',
+                  : recognized.isEmpty 
+                    ? 'Tap "Play" to hear the words'
+                    : 'Your recognized words:',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
@@ -150,21 +155,48 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
                     .toList(),
               ),
             const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.volume_up),
-                  label: const Text('Play'),
-                  onPressed: speaking ? null : _playWords,
+            
+            // Show only one button at a time
+            if (!hasPlayed && !speaking && !listening)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.volume_up),
+                label: const Text('Play Words'),
+                onPressed: _playWords,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
                 ),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.mic),
-                  label: const Text('Speak'),
-                  onPressed: listening ? null : _start,
+              ),
+            
+            if (speaking)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.volume_up),
+                label: const Text('Playing...'),
+                onPressed: null,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
                 ),
-              ],
-            ),
+              ),
+            
+            if (hasPlayed && !speaking && !listening)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.mic),
+                label: const Text('Speak Now'),
+                onPressed: _startListening,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+            
+            if (listening)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.mic),
+                label: const Text('Listening...'),
+                onPressed: null,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+            
             const SizedBox(height: 16),
             if (!listening && _splitWords(recognized).isNotEmpty)
               PrimaryButton(

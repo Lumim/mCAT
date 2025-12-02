@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:mcat_package/src/services/tts_service.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/infocard.dart';
 import '../../widgets/primary_button.dart';
@@ -14,31 +14,41 @@ class WordTaskIntroScreen extends StatefulWidget {
 
 class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
   bool _showSecond = false;
-  AudioPlayer? _player;
+  final TtsService _tts = TtsService();
   bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    _player = AudioPlayer();
+    _tts.init();
   }
 
-  Future<void> _toggleAudio() async {
+  Future<void> _togglePlay() async {
+    !_isPlaying
+        ? setState(() => _isPlaying = true)
+        : setState(() => _isPlaying = false);
+    
     if (_isPlaying) {
-      await _player!.pause();
-      setState(() => _isPlaying = false);
+      final String fullText = !_showSecond
+          ? 'This is a test where you’ll hear a series of words. '
+            'Repeat each word clearly into the microphone when prompted.'
+          : 'When you’re ready, press "Start Assessment". '
+            'You’ll hear a list of words—repeat each one aloud. '
+            'Your responses will be analyzed using speech recognition.';
+      
+      await _tts.speak(fullText);
     } else {
-      await _player!.play(AssetSource('sounds/face_1.mp3'));
-      setState(() => _isPlaying = true);
-      _player!.onPlayerComplete.listen((_) {
-        if (mounted) setState(() => _isPlaying = false);
-      });
+      _tts.dispose();
     }
+    
+    // small pause feels natural
+    await Future.delayed(const Duration(milliseconds: 400));
   }
 
   @override
   void dispose() {
-    _player?.dispose();
+    if (mounted) setState(() => _isPlaying = false);
+    _tts.dispose();
     super.dispose();
   }
 
@@ -49,76 +59,98 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
       appBar: const HeaderBar(title: 'Word Task', activeStep: 2),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
-        child:
-            !_showSecond ? _buildIntro(context) : _buildInstructions(context),
+        transitionBuilder: (child, animation) =>
+            FadeTransition(opacity: animation, child: child),
+        child: !_showSecond
+            ? _buildFirstScreen(context, key: const ValueKey('first'))
+            : _buildSecondScreen(context, key: const ValueKey('second')),
       ),
     );
   }
 
-  Widget _buildIntro(BuildContext context) {
+  Widget _buildFirstScreen(BuildContext context, {Key? key}) {
     return Padding(
-      key: const ValueKey('intro'),
+      key: key,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 16),
-          const Text('Instructions',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+          const Center(
+            child: Text(
+              'Instructions',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
           const SizedBox(height: 16),
           InfoCard(
-              text: 'This is a test where you’ll hear a series of words. '
+            text: 'This is a test where you’ll hear a series of words. '
                   'Repeat each word clearly into the microphone when prompted.',
-              fontSize: 16),
-          const Spacer(),
+            fontSize: 16,
+          ),
+          const Spacer(flex: 12),
           PrimaryButton(
             label: 'Next',
             onPressed: () => setState(() => _showSecond = true),
           ),
-          const SizedBox(height: 16),
+          const Spacer(flex: 1),
         ],
       ),
     );
   }
 
-  Widget _buildInstructions(BuildContext context) {
+  Widget _buildSecondScreen(BuildContext context, {Key? key}) {
     return Padding(
-      key: const ValueKey('instructions'),
+      key: key,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 16),
-          const Text('Instructions',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+          const Center(
+            child: Text(
+              'Instructions',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
           const SizedBox(height: 16),
           InfoCard(
-              text: 'When you’re ready, press “Start Assessment”. '
-                  'You’ll hear a list of words—repeat each one aloud. '
+            text: 'When you\'re ready, press "Start Assessment". '
+                  'You\'ll hear a list of words—repeat each one aloud. '
                   'Your responses will be analyzed using speech recognition.',
-              fontSize: 16),
+            fontSize: 16,
+          ),
           const SizedBox(height: 24),
           TextButton.icon(
-            onPressed: _toggleAudio,
+            onPressed: _togglePlay,
             icon: Icon(
               _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
               color: Colors.blue,
               size: 28,
             ),
             label: Text(
-              _isPlaying ? 'Pause audio' : 'Hear instructions',
+              _isPlaying ? 'Playing' : 'Hear instructions',
               style: const TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
+                color: Colors.blue,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          const Spacer(),
+          const Spacer(flex: 16),
           !_isPlaying
               ? PrimaryButton(
                   label: 'Start Assessment',
                   onPressed: widget.onNext,
                 )
               : const SizedBox.shrink(),
-          const SizedBox(height: 16),
+          const Spacer(flex: 2),
         ],
       ),
     );
