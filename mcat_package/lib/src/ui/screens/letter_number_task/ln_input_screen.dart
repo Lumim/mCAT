@@ -68,7 +68,7 @@ class _LnInputScreenState extends State<LnInputScreen> {
     final roundNo = widget.controller.roundIndex + 1;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: HeaderBar(title: 'Letter-Number Task ($roundNo)', activeStep: 3),
+      appBar: HeaderBar(title: 'Letter-Number Task $roundNo', activeStep: 3),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

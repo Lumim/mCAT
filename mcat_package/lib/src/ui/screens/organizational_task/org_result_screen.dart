@@ -25,7 +25,7 @@ class OrgResultScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Results', activeStep: 4),
+      appBar: const HeaderBar(title: 'Organizatioanl Result', activeStep: 4),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

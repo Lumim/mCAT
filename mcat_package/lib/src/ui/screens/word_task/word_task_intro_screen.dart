@@ -27,20 +27,20 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
     !_isPlaying
         ? setState(() => _isPlaying = true)
         : setState(() => _isPlaying = false);
-    
+
     if (_isPlaying) {
       final String fullText = !_showSecond
           ? 'This is a test where you’ll hear a series of words. '
-            'Repeat each word clearly into the microphone when prompted.'
+              'Repeat each word clearly into the microphone when prompted.'
           : 'When you’re ready, press "Start Assessment". '
-            'You’ll hear a list of words—repeat each one aloud. '
-            'Your responses will be analyzed using speech recognition.';
-      
+              'You’ll hear a list of words—repeat each one aloud. '
+              'Your responses will be analyzed using speech recognition.';
+
       await _tts.speak(fullText);
     } else {
       _tts.dispose();
     }
-    
+
     // small pause feels natural
     await Future.delayed(const Duration(milliseconds: 400));
   }
@@ -87,8 +87,11 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
           ),
           const SizedBox(height: 16),
           InfoCard(
-            text: 'This is a test where you’ll hear a series of words. '
-                  'Repeat each word clearly into the microphone when prompted.',
+            text:
+                'In this task, you will hear a list of words. After you have heard the list you will be asked to repeat as many words as you can remember in any order.'
+                'It is important that you speak loud and clear and that you try to avoid saying anything other than the words.'
+                'Also, remember to press the "Play words" button for hearing the words.'
+                'You will now hear the list one last time. As before repeat back as many words as you can remember in any order, including the ones you have already said in the previous round. Remember to press the speak button before repeating the words.',
             fontSize: 16,
           ),
           const Spacer(flex: 12),
@@ -122,8 +125,8 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
           const SizedBox(height: 16),
           InfoCard(
             text: 'When you\'re ready, press "Start Assessment". '
-                  'You\'ll hear a list of words—repeat each one aloud. '
-                  'Your responses will be analyzed using speech recognition.',
+                'You\'ll hear a list of words—repeat each one aloud. '
+                'Your responses will be analyzed using speech recognition.',
             fontSize: 16,
           ),
           const SizedBox(height: 24),

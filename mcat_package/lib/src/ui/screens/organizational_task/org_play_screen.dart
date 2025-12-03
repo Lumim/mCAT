@@ -43,8 +43,7 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
-      appBar: HeaderBar(
-          title: 'Organizational – Round $roundNo/$total', activeStep: 4),
+      appBar: HeaderBar(title: 'Organizational Task– $roundNo', activeStep: 4),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -52,7 +51,7 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
             const Text('Tap Play to hear the sequence:',
                 textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            Card(
+            /*    Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               child: Padding(
@@ -64,7 +63,7 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
                       fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ),
-            ),
+            ), */
             const Spacer(),
             Row(
               children: [

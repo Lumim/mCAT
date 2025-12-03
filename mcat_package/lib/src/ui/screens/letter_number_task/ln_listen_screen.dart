@@ -141,7 +141,7 @@ class _LnListenScreenState extends State<LnListenScreen> {
             const SizedBox(height: 16),
             Text(
               listening
-                  ? '🎤 Listening...'
+                  ? 'Listening'
                   : 'Recognized:${recognized.isEmpty && !listening ? "(none)" : ""}',
               textAlign: TextAlign.center,
             ),
