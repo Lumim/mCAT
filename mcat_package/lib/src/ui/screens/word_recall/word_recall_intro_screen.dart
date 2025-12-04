@@ -23,13 +23,7 @@ class WordRecallIntroScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
         child: Column(
           children: [
-            const Spacer(),
-            /*  const Icon(
-              Icons.library_books_outlined,
-              size: 80,
-              color: Colors.black54,
-            ), */
-            const SizedBox(height: 24),
+           
             /*  const Text(
               'Word Recall Task',
               style: TextStyle(

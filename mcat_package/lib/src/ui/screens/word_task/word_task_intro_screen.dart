@@ -30,10 +30,14 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
 
     if (_isPlaying) {
       final String fullText = !_showSecond
-          ? 'This is a test where you’ll hear a series of words. '
+          ? 
+          'This is a test where you will hear a series of words. '
               'Repeat each word clearly into the microphone when prompted.'
-          : 'When you’re ready, press "Start Assessment". '
-              'You’ll hear a list of words—repeat each one aloud. '
+          : 
+           'In this task, you will hear a list of words. After you have heard the list you will be asked to repeat as many words as you can remember in any order.'
+                'It is important that you speak loud and clear and that you try to avoid saying anything other than the words.'
+                'When you are ready, press "Start Assessment". '
+              'First you will practice with 3 words, then in the actual task, you will hear a list of words—repeat each one aloud. '
               'Your responses will be analyzed using speech recognition.';
 
       await _tts.speak(fullText);
@@ -89,12 +93,17 @@ class _WordTaskIntroScreenState extends State<WordTaskIntroScreen> {
           InfoCard(
             text:
                 'In this task, you will hear a list of words. After you have heard the list you will be asked to repeat as many words as you can remember in any order.'
-                'It is important that you speak loud and clear and that you try to avoid saying anything other than the words.'
+                'It is important that you speak loud and clear and that you try to avoid saying anything other than the words.',
+              fontSize: 16,
+          ),
+          const Spacer(flex: 1),
+          InfoCard(
+            text:
                 'Also, remember to press the "Play words" button for hearing the words.'
                 'You will now hear the list one last time. As before repeat back as many words as you can remember in any order, including the ones you have already said in the previous round. Remember to press the speak button before repeating the words.',
             fontSize: 16,
           ),
-          const Spacer(flex: 12),
+          const SizedBox(height: 16),
           PrimaryButton(
             label: 'Next',
             onPressed: () => setState(() => _showSecond = true),

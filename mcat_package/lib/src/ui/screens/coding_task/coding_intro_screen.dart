@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/infocard.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/primary_button.dart';
 import '../../../services/tts_service.dart';
@@ -40,16 +41,20 @@ class _CodingIntroScreenState extends State<CodingIntroScreen> {
             const SizedBox(height: 20),
             const Text('Instructions',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            _card(
-              'In this task, you are going to match symbols with letters. '
-              'Before doing the test, you will have the opportunity to practice this “letter and code” task.',
+
+            InfoCard(
+              text:
+                  'In this task, you are going to match symbols with letters. '
+                  'Before doing the test, you will have the opportunity to practice this “letter and code” task.',
+              fontSize: 16,
             ),
-            const SizedBox(height: 12),
-            _card(
-              'You will practice 1 set of 6 codes and will be told whether your answer was right or wrong.',
+            const Spacer(flex: 1),
+            InfoCard(
+              text:
+                  'You will practice 1 set of 6 codes and will be told whether your answer was right or wrong.',
+              fontSize: 16,
             ),
-            const Spacer(),
+            const SizedBox(height: 20),
             TextButton.icon(
               onPressed: _speak,
               icon: const Icon(Icons.play_circle_fill, color: Colors.blue),
@@ -57,9 +62,10 @@ class _CodingIntroScreenState extends State<CodingIntroScreen> {
                   style: TextStyle(
                       color: Colors.blue, fontWeight: FontWeight.w600)),
             ),
-            const SizedBox(height: 12),
+
+            const Spacer(flex: 3),
             PrimaryButton(label: 'Start Assessment', onPressed: widget.onNext),
-            const Spacer(flex: 8),
+            const SizedBox(height: 20),
           ],
         ),
       ),

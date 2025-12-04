@@ -73,12 +73,12 @@ class WordRecallInstructionScreen extends StatelessWidget {
                           'This task goes back to the words that you heard in the first task. '),
                   const SizedBox(height: 20),
                   _buildBullet(
-                    Icons.volume_up_outlined,
+                    Icons.hearing,
                     'Do you remember the list that we went over three times earlier? In a short while you will have to repeat as many words as you remember from that list in any order.',
                   ),
                   const SizedBox(height: 12),
                   _buildBullet(
-                    Icons.visibility_off_outlined,
+                    Icons.campaign,
                     'It is important that you speak loud and clear and that you try to avoid saying anything other than the words. Also, it is important that you make a brief pause between the words when repeating them.',
                   ),
                   const SizedBox(height: 12),

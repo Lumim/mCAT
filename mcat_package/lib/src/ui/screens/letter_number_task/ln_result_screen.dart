@@ -17,8 +17,8 @@ class LnResultScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 12),
             const Text(
-              'Great job! Your responses were recorded.'
-              'Your score saved successfully.',
+              'Task is compleated. Your responses and scores were saved.',
+    
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),

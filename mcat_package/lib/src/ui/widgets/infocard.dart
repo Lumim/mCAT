@@ -4,30 +4,27 @@ class InfoCard extends StatelessWidget {
   final String text;
   final int? fontSize;
 
-  const InfoCard(
-      {super.key,
-      required this.text,
-      this.fontSize}); // Remove the positional String s parameter
+  const InfoCard({
+    super.key,
+    required this.text,
+    this.fontSize,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 3),
-          ),
-        ],
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: (fontSize ?? 20).toDouble(), height: 1.4),
-        textAlign: TextAlign.center,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          text, // Use the instance variable
+          textAlign: TextAlign.center,
+          style: fontSize != null 
+              ? TextStyle(fontSize: fontSize!.toDouble()) 
+              : null,
+        ),
       ),
     );
   }

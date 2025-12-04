@@ -82,7 +82,7 @@ class _LnInputScreenState extends State<LnInputScreen> {
               textAlign: TextAlign.center,
               maxLength: widget.controller.current.letterSeq.length,
               decoration: InputDecoration(
-                counterText: widget.controller.current.letterSeq.join(', '),
+               // counterText: widget.controller.current.letterSeq.join(', '),
                 hintText: 'Type here',
                 border: OutlineInputBorder(),
               ),

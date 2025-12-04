@@ -129,7 +129,7 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Press the microphone and say all the words you remember from the Word Task.\n'
+              'Press the speak button bellow and say all the words you remember from the Word Task.\n'
               'You will have up to 20 seconds.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.black87),
@@ -142,7 +142,7 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
                   ? '🎤 Listening for 20 seconds...'
                   : recognized.isEmpty
                       ? 'You said: (none yet)'
-                      : 'You said:',
+                      : 'Listening .... You said:',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 16),
             ),
@@ -195,10 +195,10 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
       width: listening ? 70 : 50,
       height: listening ? 70 : 50,
       decoration: BoxDecoration(
-        color: listening ? Colors.blue : Colors.grey,
+        color: listening || recognized.isNotEmpty ? Colors.blue : Colors.grey,
         shape: BoxShape.circle,
         boxShadow: [
-          if (listening)
+          if (listening|| recognized.isNotEmpty)
             BoxShadow(
               color: Colors.blue.withOpacity(0.3),
               blurRadius: 20,
