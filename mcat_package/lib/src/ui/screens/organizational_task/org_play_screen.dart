@@ -33,13 +33,12 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
     await _tts.speak(widget.controller.current.ttsPhrase);
     // small pause feels natural
     await Future.delayed(const Duration(milliseconds: 400));
-    if (mounted) setState(() => _speaking = false);
+    if (mounted) setState(() => _speaking = true);
   }
 
   @override
   Widget build(BuildContext context) {
     final roundNo = widget.controller.roundIndex + 1;
-    final total = widget.controller.totalRounds;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FB),
@@ -51,19 +50,6 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
             const Text('Tap Play to hear the sequence:',
                 textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            /*    Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  widget.controller.current.ttsPhrase,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ), */
             const Spacer(),
             Row(
               children: [
@@ -89,7 +75,7 @@ class _OrgPlayScreenState extends State<OrgPlayScreen> {
                 foregroundColor: const Color(0xFFFFFFFF),
                 backgroundColor: const Color(0xFF006BA6),
               ),
-              child: const Text('Start Typing'),
+              child: const Text('Type Answer'),
             ),
             const SizedBox(height: 16),
           ],

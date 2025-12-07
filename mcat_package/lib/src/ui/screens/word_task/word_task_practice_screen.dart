@@ -104,84 +104,87 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
   // ——————————————————————————
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const HeaderBar(title: 'Word Task – Practice', activeStep: 2),
-      backgroundColor: const Color(0xFFF5F6FB),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const Text(
-              'Let\'s practice.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-            const Text(
-              'Listen carefully and repeat all the words you hear.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-
-            const SizedBox(height: 20),
-            _micIndicator(),
-            const SizedBox(height: 20),
-
-            Text(
-              listening
-                  ? '🎤 Listening...'
-                  : recognized.isEmpty
-                      ? 'Tap "Play" to hear the words'
-                      : 'Your recognized words:',
-            ),
-
-            const SizedBox(height: 10),
-
-            if (recognized.isNotEmpty)
-              Wrap(
-                spacing: 8,
-                children: recognized
-                    .split(RegExp(r'\s+'))
-                    .where((w) => w.isNotEmpty)
-                    .map((w) => Chip(
-                          label: Text(w),
-                          backgroundColor: Colors.blue.shade50,
-                        ))
-                    .toList(),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        appBar: const HeaderBar(title: 'Word Task – Practice', activeStep: 2),
+        backgroundColor: const Color(0xFFF5F6FB),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const Text(
+                'Let\'s practice.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              const Text(
+                'Listen carefully and repeat all the words you hear.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
 
-            const Spacer(),
+              const SizedBox(height: 20),
+              _micIndicator(),
+              const SizedBox(height: 20),
 
-            // Before TTS
-            if (!speaking && !listening && !ttsFinished && recognized.isEmpty)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.volume_up),
-                label: const Text("Play Words"),
-                onPressed: _playWords,
+              Text(
+                listening
+                    ? '🎤 Listening...'
+                    : recognized.isEmpty
+                        ? 'Tap "Play" to hear the words'
+                        : 'Your recognized words:',
               ),
 
-            // During TTS
-            if (speaking)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.volume_up),
-                label: const Text("Playing..."),
-                onPressed: null,
-              ),
+              const SizedBox(height: 10),
 
-            // After TTS → Speak
-            if (ttsFinished && !listening && recognized.isEmpty)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.mic),
-                label: const Text("Speak"),
-                onPressed: _startListening,
-              ),
+              if (recognized.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  children: recognized
+                      .split(RegExp(r'\s+'))
+                      .where((w) => w.isNotEmpty)
+                      .map((w) => Chip(
+                            label: Text(w),
+                            backgroundColor: Colors.blue.shade50,
+                          ))
+                      .toList(),
+                ),
 
-            // After listening → ONLY Continue
-            if (!listening && recognized.isNotEmpty)
-              PrimaryButton(
-                label: "Continue",
-                onPressed: widget.onFinished,
-              ),
-          ],
+              const Spacer(),
+
+              // Before TTS
+              if (!speaking && !listening && !ttsFinished && recognized.isEmpty)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.volume_up),
+                  label: const Text("Play Words"),
+                  onPressed: _playWords,
+                ),
+
+              // During TTS
+              if (speaking)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.volume_up),
+                  label: const Text("Playing..."),
+                  onPressed: null,
+                ),
+
+              // After TTS → Speak
+              if (ttsFinished && !listening && recognized.isEmpty)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.mic),
+                  label: const Text("Speak"),
+                  onPressed: _startListening,
+                ),
+
+              // After listening → ONLY Continue
+              if (!listening && recognized.isNotEmpty)
+                PrimaryButton(
+                  label: "Continue",
+                  onPressed: widget.onFinished,
+                ),
+            ],
+          ),
         ),
       ),
     );

@@ -183,8 +183,18 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => WordTaskPracticeScreen(
                 words: const ['mountain', 'city', 'snowman', 'house'],
-                onFinished: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.wordAssessment),
+                onFinished: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.wordRealTaskIntro),
+              ),
+            );
+
+          case AppRoutes.wordRealTaskIntro:
+            return MaterialPageRoute(
+              builder: (context) => WordRealTaskScreen(
+                onNext: () {
+                  Navigator.of(context).pushNamed(AppRoutes.wordAssessment);
+                },
               ),
             );
 

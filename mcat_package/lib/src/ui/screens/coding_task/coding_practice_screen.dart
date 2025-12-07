@@ -65,31 +65,34 @@ class _CodingPracticeScreenState extends State<CodingPracticeScreen>
   Widget build(BuildContext context) {
     final current = _sequence[index];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Coding Practice Task', activeStep: 5),
-      body: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Column(
-          children: [
-            _buildReferenceTable(),
-            const Divider(thickness: 1),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: const HeaderBar(title: 'Coding Practice Task', activeStep: 5),
+        body: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            children: [
+              _buildReferenceTable(),
+              const Divider(thickness: 1),
 
-            /* Text('Fill in the box with correct words',
+              /* Text('Fill in the box with correct words',
                 style: const TextStyle(fontSize: 15)), */
-            const SizedBox(height: 8),
-            Text('Sequence ${index + 1}/${_sequence.length} ${current.code}',
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            ScaleTransition(
-              scale: _anim,
-              child: _codeCard(current.code),
-            ),
-            const SizedBox(height: 8),
-            _inputBox(),
-            const SizedBox(height: 6),
-            Text(feedback, style: const TextStyle(fontSize: 15)),
-          ],
+              const SizedBox(height: 8),
+              Text('Sequence ${index + 1}/${_sequence.length} ${current.code}',
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              ScaleTransition(
+                scale: _anim,
+                child: _codeCard(current.code),
+              ),
+              const SizedBox(height: 8),
+              _inputBox(),
+              const SizedBox(height: 6),
+              Text(feedback, style: const TextStyle(fontSize: 15)),
+            ],
+          ),
         ),
       ),
     );
@@ -97,37 +100,41 @@ class _CodingPracticeScreenState extends State<CodingPracticeScreen>
 
   Widget _buildReferenceTable() {
     final refCodes = CodingService.baseSet.take(5).toList();
-    return Column(
-      children: [
-        const Text(
-          'Look at the table below.\nEach letter has a code made of stars (*) and circles (o).',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: refCodes
-              .map((e) => Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(6),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Column(
+        children: [
+          const Text(
+            'Look at the table below.\nEach letter has a code made of stars (*) and circles (o).',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: refCodes
+                .map((e) => Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(e.code,
+                              style: GoogleFonts.inconsolata(
+                                  fontWeight: FontWeight.bold)),
                         ),
-                        child: Text(e.code,
-                            style: GoogleFonts.inconsolata(
-                                fontWeight: FontWeight.bold)),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(e.letter,
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ))
-              .toList(),
-        ),
-      ],
+                        const SizedBox(height: 3),
+                        Text(e.letter,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600)),
+                      ],
+                    ))
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
 

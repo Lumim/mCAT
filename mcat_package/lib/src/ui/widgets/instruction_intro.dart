@@ -14,7 +14,7 @@ class InstructionIntro extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       key: key,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

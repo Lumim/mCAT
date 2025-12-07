@@ -39,19 +39,18 @@ class HeaderBar extends StatelessWidget implements PreferredSizeWidget {
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 12),
-            // Title takes remaining space
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
+            if (activeStep == null) // or if (activeStep) if it's a boolean
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            // Optional close button on the right
             if (showCloseButton)
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.black54),

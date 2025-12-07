@@ -104,82 +104,86 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
   Widget build(BuildContext context) {
     final current = widget.items[index];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Face Task', activeStep: 1),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 8),
-            Text(
-              showImage
-                  ? 'Look at the face for 3 seconds.'
-                  : 'Select the emotion you saw:',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: showImage
-                      ? Column(
-                          key: ValueKey('img_$index'),
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Image.asset(
-                                current.asset,
-                                // ✅ IMPORTANT: load asset from package
-                                package: 'mcat_package',
-                                fit: BoxFit.contain,
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: const HeaderBar(title: 'Face Task', activeStep: 1),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 8),
+              Text(
+                showImage
+                    ? 'Look at the face for 3 seconds.'
+                    : 'Select the emotion you saw:',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: showImage
+                        ? Column(
+                            key: ValueKey('img_$index'),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Image.asset(
+                                  current.asset,
+                                  // ✅ IMPORTANT: load asset from package
+                                  package: 'mcat_package',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            AnimatedBuilder(
-                              animation: _progressController,
-                              builder: (context, child) {
-                                final progress =
-                                    1.0 - _progressController.value;
-                                return Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    height: 6,
-                                    width: MediaQuery.of(context).size.width *
-                                        progress,
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(3),
+                              const SizedBox(height: 8),
+                              AnimatedBuilder(
+                                animation: _progressController,
+                                builder: (context, child) {
+                                  final progress =
+                                      1.0 - _progressController.value;
+                                  return Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      height: 6,
+                                      width: MediaQuery.of(context).size.width *
+                                          progress,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(3),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        )
-                      : _buildEmotionOptions(),
+                                  );
+                                },
+                              ),
+                            ],
+                          )
+                        : _buildEmotionOptions(),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            if (index == widget.items.length - 1 && !showImage)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  PrimaryButton(
-                    label: 'Next',
-                    onPressed: () async {
-                      await _saveResult();
-                      widget.onFinished(score, widget.items.length);
-                    },
-                  ),
-                ],
-              ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 12),
+              if (index == widget.items.length - 1 && !showImage)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    PrimaryButton(
+                      label: 'Next',
+                      onPressed: () async {
+                        await _saveResult();
+                        widget.onFinished(score, widget.items.length);
+                      },
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );

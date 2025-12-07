@@ -73,71 +73,74 @@ class _LnPlayScreenState extends State<LnPlayScreen> {
   Widget build(BuildContext context) {
     final round = widget.controller.current;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: HeaderBar(title: 'Letter Number Task', activeStep: 3),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const Text(
-              'Review this sequence before continuing.',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: HeaderBar(title: 'Letter Number Task', activeStep: 3),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const Text(
+                'Review this sequence before continuing.',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Text(
-                      'Numbers: ${round.numberSeq.join(' ')}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Letters: ${round.letterSeq.join(' ')}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
+              const SizedBox(height: 16),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              ),
-            ),
-            const Spacer(),
-            _speaking
-                ? const Column(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
                     children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16),
                       Text(
-                        'Playing...',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        'Numbers: ${round.numberSeq.join(' ')}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Letters: ${round.letterSeq.join(' ')}',
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ],
-                  )
-                : ElevatedButton(
-                    onPressed: _playSequence,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: const Color(0xFFFFFFFF),
-                      backgroundColor: const Color(0xFF006BA6),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              _speaking
+                  ? const Column(
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text(
+                          'Playing...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    )
+                  : ElevatedButton(
+                      onPressed: _playSequence,
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFFFFFF),
+                        backgroundColor: const Color(0xFF006BA6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                      ),
+                      child: const Text(
+                        'Play Letters & Numbers',
+                        style: TextStyle(fontSize: 16),
                       ),
                     ),
-                    child: const Text(
-                      'Play Letters & Numbers',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );

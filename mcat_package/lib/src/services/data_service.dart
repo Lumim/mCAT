@@ -15,7 +15,7 @@ class DataService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String? _deviceId;
 
-  // ✅ ADD: Performance optimizations
+  //  ADD: Performance optimizations
   final _syncQueue = <TaskRecord>[];
   Timer? _syncTimer;
   bool _isSyncing = false;
@@ -61,7 +61,7 @@ class DataService {
     return '${deviceId}_$taskType';
   }
 
-  // ✅ OPTIMIZED: Save task without blocking UI
+  //  OPTIMIZED: Save task without blocking UI
   Future<void> saveTask(String taskType, Map<String, dynamic> data) async {
     // Ensure initialization is complete
     if (_initCompleter != null) {
@@ -78,16 +78,16 @@ class DataService {
       data: data,
     );
 
-    // ✅ FAST: Save to Hive immediately (local storage is quick)
+    //  FAST: Save to Hive immediately (local storage is quick)
     await _box.put(key, record);
 
-    // ✅ OPTIMIZED: Queue for Firebase sync (non-blocking)
+    //  OPTIMIZED: Queue for Firebase sync (non-blocking)
     _queueForSync(record);
 
     return; // Return immediately without waiting for sync
   }
 
-  // ✅ NEW: Queue system for Firebase syncs
+  //  NEW: Queue system for Firebase syncs
   void _queueForSync(TaskRecord record) {
     _syncQueue.add(record);
 
@@ -96,7 +96,7 @@ class DataService {
     _syncTimer = Timer(const Duration(milliseconds: 1000), _processSyncQueue);
   }
 
-  // ✅ NEW: Process sync queue in background
+  //  NEW: Process sync queue in background
   Future<void> _processSyncQueue() async {
     if (_isSyncing || _syncQueue.isEmpty) return;
 
@@ -112,7 +112,7 @@ class DataService {
     _syncQueue.clear();
 
     try {
-      // ✅ OPTIMIZED: Use batch write for multiple records
+      //  OPTIMIZED: Use batch write for multiple records
       final batch = _firestore.batch();
 
       for (final record in recordsToSync) {
@@ -121,7 +121,7 @@ class DataService {
       }
 
       await batch.commit();
-      print('✅ Synced ${recordsToSync.length} records to Firebase');
+      print(' Synced ${recordsToSync.length} records to Firebase');
     } catch (e) {
       print('xError Sync error: $e');
       // Re-add failed records to queue for retry
@@ -175,7 +175,7 @@ class DataService {
     return _box.values.toList().cast<TaskRecord>();
   }
 
-  // ✅ OPTIMIZED: Background sync with batch operations
+  //  OPTIMIZED: Background sync with batch operations
   Future<void> _syncIfOnline() async {
     if (_isSyncing) return;
 
@@ -209,12 +209,12 @@ class DataService {
   // Get device ID for debugging
   Future<String> getDeviceId() => _getDeviceId;
 
-  // ✅ NEW: Manual sync trigger
+  //  NEW: Manual sync trigger
   Future<void> forceSync() async {
     await _processSyncQueue();
   }
 
-  // ✅ NEW: Dispose method
+  //  NEW: Dispose method
   void dispose() {
     _syncTimer?.cancel();
     _syncQueue.clear();

@@ -5,7 +5,6 @@ import '../widgets/header_bar.dart';
 import '../../services/data_service.dart'; // <-- adjust if your path is different
 import '../../domain/models/task_record.dart';
 import '../widgets/mcat_task_card.dart';
-import '../widgets/instruction_intro.dart';
 
 // this is the main screen that shows all the tasks in mCAT package version 2.0.0
 // Author: Mohammad Lummim Sarker
@@ -171,25 +170,35 @@ class _AllIntroScreenState extends State<AllIntroScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Welcome to mCAT',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.info_outline),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Text("Details"),
-                          content: InstructionIntro(), // any widget you want
+                  Row(
+                    children: [
+                      Expanded(
+                        child: const Text(
+                          'Welcome to mCAT',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      );
-                    },
+                      ),
+                      const Text('Instruction'),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.info_outline_rounded,
+                          color: primaryBlue,
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: const Text("Inststruction"),
+                              content:
+                                  InstructionIntro(), // any widget you want
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   const Text(

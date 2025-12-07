@@ -19,6 +19,7 @@ class AppRoutes {
   // Word Task
   static const wordIntro = '/word_intro';
   static const wordPractice = '/word_practice';
+  static const wordRealTaskIntro = '/word_real_task';
   static const wordAssessment = '/word_assessment';
   static const wordResult = '/word_result';
 

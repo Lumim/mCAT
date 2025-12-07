@@ -20,6 +20,7 @@ export 'src/ui/screens/face_task/face_task_result_screen.dart';
 // Word Task screens
 export 'src/ui/screens/word_task/word_task_intro_screen.dart';
 export 'src/ui/screens/word_task/word_task_practice_screen.dart';
+export 'src/ui/screens/word_task/word_real_task_intro_screen.dart';
 export 'src/ui/screens/word_task/word_task_assessment_screen.dart';
 export 'src/ui/screens/word_task/word_task_result_screen.dart';
 

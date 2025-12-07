@@ -3,10 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:stts/stts.dart' as stts;
 
-/// ---------------------------------------------------------------------------
 /// Fixed Continuous Speech-to-Text Service for mCAT
 /// Proper partial + final result merging
-/// ---------------------------------------------------------------------------
 class SttService {
   final stts.Stt _speech = stts.Stt();
 
@@ -14,7 +12,7 @@ class SttService {
   bool _isListening = false;
   bool _shouldContinue = false;
 
-  String _localeId = 'en-US';
+  late String _localeId;
   String _collectedText = '';
   String _currentSessionText = '';
 
@@ -31,9 +29,8 @@ class SttService {
   bool get isListening => _isListening;
   String get collectedText => _collectedText;
 
-  /// ---------------------------------------------
   /// INIT
-  /// ---------------------------------------------
+
   Future<void> init() async {
     if (_isReady) return;
 
@@ -74,9 +71,8 @@ class SttService {
     if (kDebugMode) debugPrint('🎙️ STT ready (locale: $_localeId)');
   }
 
-  /// ---------------------------------------------
   /// START 20-second CONTINUOUS LISTENING
-  /// ---------------------------------------------
+
   Future<void> startListening({
     required void Function(String text) onPartialResult,
     required void Function(String text) onFinalResult,
@@ -107,9 +103,7 @@ class SttService {
     await _startListeningCycle();
   }
 
-  /// ---------------------------------------------
-  /// START LISTENING CYCLE
-  /// ---------------------------------------------
+//listening cycle
   Future<void> _startListeningCycle() async {
     if (!_shouldContinue) return;
 
@@ -126,7 +120,7 @@ class SttService {
         _currentSessionText = ''; // Reset for next session
 
         if (kDebugMode)
-          debugPrint('✅ Final: "$text" | Total: "$_collectedText"');
+          debugPrint('TICK Final: "$text" | Total: "$_collectedText"');
 
         _onFinalResult?.call(_collectedText);
       } else {
@@ -136,7 +130,7 @@ class SttService {
           final partialTotal = _mergeText(_collectedText, text);
 
           if (kDebugMode)
-            debugPrint('🎤 Partial: "$text" | Total: "$partialTotal"');
+            debugPrint(' [Partial]: "$text" | Total: "$partialTotal"');
 
           _onPartialResult?.call(partialTotal);
         }
@@ -152,14 +146,13 @@ class SttService {
         ),
       );
     } catch (e) {
-      if (kDebugMode) debugPrint('⚠️ Start error: $e');
+      if (kDebugMode) debugPrint('!! Start error: $e');
       _scheduleRestart();
     }
   }
 
-  /// ---------------------------------------------
   /// HANDLE STATE CHANGES
-  /// ---------------------------------------------
+
   void _handleStateChange(stts.SttState state) {
     if (kDebugMode) debugPrint('STT state: $state');
 
@@ -183,9 +176,7 @@ class SttService {
     }
   }
 
-  /// ---------------------------------------------
   /// SCHEDULE RESTART WITH DELAY
-  /// ---------------------------------------------
   void _scheduleRestart() {
     if (!_shouldContinue) return;
 
@@ -198,9 +189,7 @@ class SttService {
     });
   }
 
-  /// ---------------------------------------------
   /// COMPLETE SESSION
-  /// ---------------------------------------------
   Future<void> _completeSession() async {
     _shouldContinue = false;
     _sessionTimer?.cancel();
@@ -220,16 +209,12 @@ class SttService {
       debugPrint('🎯 Session completed. Final text: "$_collectedText"');
   }
 
-  /// ---------------------------------------------
   /// STOP MANUALLY
-  /// ---------------------------------------------
   Future<void> stopListening() async {
     await _completeSession();
   }
 
-  /// ---------------------------------------------
   /// TEXT PROCESSING HELPERS
-  /// ---------------------------------------------
 
   /// Check if new text is meaningfully different from current
   bool _isNewContent(String newText) {
@@ -284,9 +269,7 @@ class SttService {
     return '$existing $newText'.trim();
   }
 
-  /// ---------------------------------------------
   /// ERROR HANDLING
-  /// ---------------------------------------------
   void _onError(dynamic err) {
     if (kDebugMode) debugPrint('⚠️ STT error: $err');
 
@@ -297,9 +280,7 @@ class SttService {
     }
   }
 
-  /// ---------------------------------------------
   /// DISPOSE
-  /// ---------------------------------------------
   void dispose() {
     _shouldContinue = false;
     _sessionTimer?.cancel();
@@ -311,9 +292,7 @@ class SttService {
     } catch (_) {}
   }
 
-  /// ---------------------------------------------
   /// NORMALIZE LOCALE
-  /// ---------------------------------------------
   String _normalizeLocale(ui.Locale locale) {
     final lang = locale.languageCode.isNotEmpty ? locale.languageCode : 'en';
     final country =

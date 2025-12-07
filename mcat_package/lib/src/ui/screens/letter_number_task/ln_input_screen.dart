@@ -66,41 +66,44 @@ class _LnInputScreenState extends State<LnInputScreen> {
   @override
   Widget build(BuildContext context) {
     final roundNo = widget.controller.roundIndex + 1;
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: HeaderBar(title: 'Letter-Number Task $roundNo', activeStep: 3),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const Text('Enter the Letters:'),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _ctrl,
-              autofocus: true,
-              textCapitalization: TextCapitalization.characters,
-              textAlign: TextAlign.center,
-              maxLength: widget.controller.current.letterSeq.length,
-              decoration: InputDecoration(
-               // counterText: widget.controller.current.letterSeq.join(', '),
-                hintText: 'Type here',
-                border: OutlineInputBorder(),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: HeaderBar(title: 'Letter-Number Task $roundNo', activeStep: 3),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const Text('Enter the Letters:'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _ctrl,
+                autofocus: true,
+                textCapitalization: TextCapitalization.characters,
+                textAlign: TextAlign.center,
+                maxLength: widget.controller.current.letterSeq.length,
+                decoration: InputDecoration(
+                  // counterText: widget.controller.current.letterSeq.join(', '),
+                  hintText: 'Type here',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (val) {
+                  val = val.toUpperCase();
+                },
               ),
-              onChanged: (val) {
-                val = val.toUpperCase();
-              },
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: _onContinue,
-              style: ElevatedButton.styleFrom(
-                foregroundColor: const Color(0xFFFFFFFF),
-                backgroundColor: const Color(0xFF006BA6),
+              const Spacer(),
+              ElevatedButton(
+                onPressed: _onContinue,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: const Color(0xFFFFFFFF),
+                  backgroundColor: const Color(0xFF006BA6),
+                ),
+                child: const Text('Continue'),
               ),
-              child: const Text('Continue'),
-            ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );

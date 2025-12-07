@@ -13,13 +13,29 @@ class CodingIntroScreen extends StatefulWidget {
 }
 
 class _CodingIntroScreenState extends State<CodingIntroScreen> {
+  bool _isPlaying = false;
   final _tts = TtsService();
+  @override
+  void initState() {
+    super.initState();
+    _tts.init();
+  }
 
   Future<void> _speak() async {
-    await _tts.speak(
-      'In this task, you will match symbols made of stars and circles with letters. '
-      'You will first practice before starting the real test.',
-    );
+    !_isPlaying
+        ? setState(() => _isPlaying = true)
+        : setState(() => _isPlaying = false);
+    _isPlaying
+        ? await _tts.speak(
+            'In this task, you will match symbols made of stars and circles with letters. '
+            'Before doing the test, you will have the opportunity to practice this "letter'
+            ' and code" task. You will be able to practice 6 times and you will be told whether what you typed was right or wrong.'
+            'The task is to complete each box with the correct letter that corresponds to the code. '
+            'By starting the task, you should fill in the boxes below with the correct letter.'
+            'When entering a letter, The test will automatically move you to the next code. Note that you cannot go back and correct letters, so just proceed to the right.',
+          )
+        : _tts.dispose();
+    await Future.delayed(const Duration(milliseconds: 400));
   }
 
   @override
@@ -57,26 +73,25 @@ class _CodingIntroScreenState extends State<CodingIntroScreen> {
             const SizedBox(height: 20),
             TextButton.icon(
               onPressed: _speak,
-              icon: const Icon(Icons.play_circle_fill, color: Colors.blue),
-              label: const Text('Hear instructions',
+              icon: Icon(
+                _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+                color: Colors.blue,
+                size: 28,
+              ),
+              label: Text(_isPlaying ? 'Playing' : 'Hear instructions',
                   style: TextStyle(
                       color: Colors.blue, fontWeight: FontWeight.w600)),
             ),
 
             const Spacer(flex: 3),
-            PrimaryButton(label: 'Start Assessment', onPressed: widget.onNext),
+            !_isPlaying
+                ? PrimaryButton(
+                    label: 'Start Assessment', onPressed: widget.onNext)
+                : const SizedBox.shrink(),
             const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
-
-  Widget _card(String text) => Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(text, style: const TextStyle(fontSize: 15, height: 1.4)),
-        ),
-      );
 }

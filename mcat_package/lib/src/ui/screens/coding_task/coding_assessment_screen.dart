@@ -105,46 +105,49 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
     final current = _sequence[index];
     final remaining = 60 - elapsed;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Coding Task', activeStep: 5),
-      body: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Column(
-          children: [
-            _buildReferenceTable(),
-            const Divider(thickness: 1),
-            Text(
-                '${current.code}Sequence ${index + 1}/$total • Time left: $remaining s',
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 14),
-            ScaleTransition(
-              scale: _anim,
-              child: _codeCard(current.code),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: 120,
-              child: TextField(
-                controller: controller,
-                autofocus: true,
-                textCapitalization: TextCapitalization.characters,
-                textAlign: TextAlign.center,
-                maxLength: 1,
-                decoration: const InputDecoration(
-                  counterText: '',
-                  hintText: 'Type here',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (val) {
-                  if (val.isNotEmpty) {
-                    Future.delayed(const Duration(milliseconds: 200))
-                        .then((_) => _checkLetter(val));
-                  }
-                },
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: const HeaderBar(title: 'Coding Task', activeStep: 5),
+        body: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            children: [
+              _buildReferenceTable(),
+              const Divider(thickness: 1),
+              Text(
+                  '${current.code}Sequence ${index + 1}/$total • Time left: $remaining s',
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 14),
+              ScaleTransition(
+                scale: _anim,
+                child: _codeCard(current.code),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              SizedBox(
+                width: 120,
+                child: TextField(
+                  controller: controller,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.characters,
+                  textAlign: TextAlign.center,
+                  maxLength: 1,
+                  decoration: const InputDecoration(
+                    counterText: '',
+                    hintText: 'Type here',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (val) {
+                    if (val.isNotEmpty) {
+                      Future.delayed(const Duration(milliseconds: 200))
+                          .then((_) => _checkLetter(val));
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -152,37 +155,41 @@ class _CodingAssessmentScreenState extends State<CodingAssessmentScreen>
 
   Widget _buildReferenceTable() {
     final refCodes = CodingService.baseSet.take(5).toList();
-    return Column(
-      children: [
-        const Text(
-          'Look at the table below.\nEach letter has a code made of stars (*) and circles (o).',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: refCodes
-              .map((e) => Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(6),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Column(
+        children: [
+          const Text(
+            'Look at the table below.\nEach letter has a code made of stars (*) and circles (o).',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: refCodes
+                .map((e) => Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(e.code,
+                              style: GoogleFonts.inconsolata(
+                                  fontWeight: FontWeight.bold)),
                         ),
-                        child: Text(e.code,
-                            style: GoogleFonts.inconsolata(
-                                fontWeight: FontWeight.bold)),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(e.letter,
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ))
-              .toList(),
-        ),
-      ],
+                        const SizedBox(height: 3),
+                        Text(e.letter,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600)),
+                      ],
+                    ))
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
 

@@ -44,9 +44,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
     await _stt.init();
   }
 
-  // ——————————————————————————
   // PLAY ALL WORDS SEQUENTIALLY
-  // ——————————————————————————
   Future<void> _playAllWords() async {
     if (speaking) return;
 
@@ -68,9 +66,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
     });
   }
 
-  // ——————————————————————————
   // START LISTENING
-  // ——————————————————————————
   Future<void> _startListening() async {
     setState(() {
       listening = true;
@@ -90,9 +86,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
     );
   }
 
-  // ——————————————————————————
   // STOP LISTENING
-  // ——————————————————————————
   Future<void> _stopListening() async {
     await _stt.stopListening();
 
@@ -101,9 +95,7 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
     setState(() => listening = false);
   }
 
-  // ——————————————————————————
   // EVALUATE RESULTS
-  // ——————————————————————————
   void _evaluateAndFinish() {
     final spokenWords = recognized
         .toLowerCase()
@@ -154,81 +146,84 @@ class _WordTaskAssessmentScreenState extends State<WordTaskAssessmentScreen> {
   // ——————————————————————————
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Word Task', activeStep: 2),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const Text(
-              'Listen carefully and repeat all the words you hear.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-
-            const SizedBox(height: 20),
-
-            _micIndicator(),
-
-            const SizedBox(height: 16),
-
-            if (listening)
-              const Text('🎤 Listening...', textAlign: TextAlign.center),
-
-            const SizedBox(height: 10),
-
-            if (recognized.isNotEmpty)
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                children: recognized
-                    .split(RegExp(r'\s+'))
-                    .where((w) => w.isNotEmpty)
-                    .map((w) => Chip(
-                          label: Text(w),
-                          backgroundColor: Colors.blue.shade50,
-                        ))
-                    .toList(),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: const HeaderBar(title: 'Word Task', activeStep: 2),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const Text(
+                'Listen carefully and repeat all the words you hear.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
 
-            const Spacer(),
+              const SizedBox(height: 20),
 
-            // 1️⃣ SHOW "Play Words" only before TTS starts
-            if (!speaking && !listening && !ttsFinished && recognized.isEmpty)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.volume_up),
-                label: const Text("Play Words"),
-                onPressed: _playAllWords,
-              ),
+              _micIndicator(),
 
-            // 2️⃣ Playing → Disabled button
-            if (speaking)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.volume_up),
-                label: const Text("Playing..."),
-                onPressed: null,
-              ),
+              const SizedBox(height: 16),
 
-            // 3️⃣ After TTS ends → Show Speak button
-            if (ttsFinished && !listening)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.mic),
-                label: const Text("Speak"),
-                onPressed: _startListening,
-              ),
+              if (listening)
+                const Text('🎤 Listening...', textAlign: TextAlign.center),
 
-            // 4️⃣ During listening → No buttons
+              const SizedBox(height: 10),
 
-            const SizedBox(height: 20),
+              if (recognized.isNotEmpty)
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  children: recognized
+                      .split(RegExp(r'\s+'))
+                      .where((w) => w.isNotEmpty)
+                      .map((w) => Chip(
+                            label: Text(w),
+                            backgroundColor: Colors.blue.shade50,
+                          ))
+                      .toList(),
+                ),
 
-            // 5️⃣ After listening ends → Only "Next"
-            if (!listening && recognized.isNotEmpty)
-              PrimaryButton(
-                label: "Next",
-                onPressed: _evaluateAndFinish,
-              ),
-          ],
+              const Spacer(),
+
+              // 1️⃣ SHOW "Play Words" only before TTS starts
+              if (!speaking && !listening && !ttsFinished && recognized.isEmpty)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.volume_up),
+                  label: const Text("Play Words"),
+                  onPressed: _playAllWords,
+                ),
+
+              // 2️⃣ Playing → Disabled button
+              if (speaking)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.volume_up),
+                  label: const Text("Playing..."),
+                  onPressed: null,
+                ),
+
+              // 3️⃣ After TTS ends → Show Speak button
+              if (ttsFinished && !listening)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.mic),
+                  label: const Text("Speak"),
+                  onPressed: _startListening,
+                ),
+
+              // 4️⃣ During listening → No buttons
+
+              const SizedBox(height: 20),
+
+              // 5️⃣ After listening ends → Only "Next"
+              if (!listening && recognized.isNotEmpty)
+                PrimaryButton(
+                  label: "Next",
+                  onPressed: _evaluateAndFinish,
+                ),
+            ],
+          ),
         ),
       ),
     );

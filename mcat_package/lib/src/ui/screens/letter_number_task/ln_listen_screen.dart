@@ -108,60 +108,63 @@ class _LnListenScreenState extends State<LnListenScreen> {
   Widget build(BuildContext context) {
     final roundNo = widget.controller.roundIndex + 1;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: HeaderBar(title: 'LN – Round $roundNo', activeStep: 3),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const Text(
-              'Please count backwards from the number below.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 20),
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 24, horizontal: 48),
-                child: Text(
-                  widget.controller.current.numberSeq.join(''),
-                  style: const TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.indigo),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: HeaderBar(title: 'LN – Round $roundNo', activeStep: 3),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const Text(
+                'Please count backwards from the number below.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18),
+              ),
+              const SizedBox(height: 20),
+              Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 24, horizontal: 48),
+                  child: Text(
+                    widget.controller.current.numberSeq.join(''),
+                    style: const TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.indigo),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 28),
-            _micIndicator(),
-            const SizedBox(height: 16),
-            Text(
-              listening
-                  ? 'Listening'
-                  : 'Recognized:${recognized.isEmpty && !listening ? "(none)" : ""}',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            if (recognized.isNotEmpty)
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
-                children: _splitWords(recognized)
-                    .map(
-                      (word) => Chip(
-                        label: Text(word),
-                        backgroundColor: Colors.blue.shade50,
-                      ),
-                    )
-                    .toList(),
+              const SizedBox(height: 28),
+              _micIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                listening
+                    ? 'Listening'
+                    : 'Recognized:${recognized.isEmpty && !listening ? "(none)" : ""}',
+                textAlign: TextAlign.center,
               ),
-            const Spacer(),
-          ],
+              const SizedBox(height: 10),
+              if (recognized.isNotEmpty)
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _splitWords(recognized)
+                      .map(
+                        (word) => Chip(
+                          label: Text(word),
+                          backgroundColor: Colors.blue.shade50,
+                        ),
+                      )
+                      .toList(),
+                ),
+              const Spacer(),
+            ],
+          ),
         ),
       ),
     );

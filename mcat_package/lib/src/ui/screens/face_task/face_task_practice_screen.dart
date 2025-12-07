@@ -108,120 +108,127 @@ class _FaceTaskPracticeScreenState extends State<FaceTaskPracticeScreen>
 
     final item = widget.practiceImageAssets[index];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Face Task', activeStep: 1),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 8),
-            Text(
-              showImage
-                  ? 'Look at the face for 3 seconds.'
-                  : 'Select the emotion you saw:',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: const HeaderBar(title: 'Face Task', activeStep: 1),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 8),
+              Text(
+                showImage
+                    ? 'Look at the face for 3 seconds.'
+                    : 'Select the emotion you saw:',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: showImage
-                      ? Column(
-                          key: ValueKey('img_$index'),
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Image.asset(
-                                item.asset,
-                                package: 'mcat_package', // ✅ load from package
-                                fit: BoxFit.contain,
+              const SizedBox(height: 16),
+              Expanded(
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: showImage
+                        ? Column(
+                            key: ValueKey('img_$index'),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Image.asset(
+                                  item.asset,
+                                  package:
+                                      'mcat_package', // ✅ load from package
+                                  fit: BoxFit.contain,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            AnimatedBuilder(
-                              animation: _progressController,
-                              builder: (context, child) {
-                                final progress =
-                                    1.0 - _progressController.value;
-                                return Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    height: 6,
-                                    width: MediaQuery.of(context).size.width *
-                                        progress,
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(3),
+                              const SizedBox(height: 8),
+                              AnimatedBuilder(
+                                animation: _progressController,
+                                builder: (context, child) {
+                                  final progress =
+                                      1.0 - _progressController.value;
+                                  return Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      height: 6,
+                                      width: MediaQuery.of(context).size.width *
+                                          progress,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(3),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        )
-                      : _buildEmotionOptions(),
+                                  );
+                                },
+                              ),
+                            ],
+                          )
+                        : _buildEmotionOptions(),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            if (index == widget.practiceImageAssets.length - 1 && !showImage)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Add 10px gap
-                  PrimaryButton(
-                    label: 'Finish',
-                    onPressed: _finishPractice,
-                  ),
-                ],
-              ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 12),
+              if (index == widget.practiceImageAssets.length - 1 && !showImage)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Add 10px gap
+                    PrimaryButton(
+                      label: 'Finish',
+                      onPressed: _finishPractice,
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildEmotionOptions() {
-    return Column(
-      key: const ValueKey('options'),
-      children: [
-        const SizedBox(height: 12),
-        Column(
-          children: Emotion.values.map((e) {
-            final isSelected = selected == e;
-            return Container(
-              margin: const EdgeInsets.symmetric(vertical: 5),
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                icon: Icon(e.icon, color: e.color, size: 26),
-                label: Text(e.label),
-                style: OutlinedButton.styleFrom(
-                  backgroundColor:
-                      isSelected ? e.color.withOpacity(0.15) : Colors.white,
-                  side: BorderSide(
-                    color: isSelected ? e.color : Colors.grey.shade300,
-                    width: isSelected ? 2 : 1,
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Column(
+        key: const ValueKey('options'),
+        children: [
+          const SizedBox(height: 12),
+          Column(
+            children: Emotion.values.map((e) {
+              final isSelected = selected == e;
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 5),
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: Icon(e.icon, color: e.color, size: 26),
+                  label: Text(e.label),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor:
+                        isSelected ? e.color.withOpacity(0.15) : Colors.white,
+                    side: BorderSide(
+                      color: isSelected ? e.color : Colors.grey.shade300,
+                      width: isSelected ? 2 : 1,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  onPressed: () => _selectEmotion(e),
                 ),
-                onPressed: () => _selectEmotion(e),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }

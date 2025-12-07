@@ -8,30 +8,33 @@ class LnResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
-      appBar: const HeaderBar(title: 'Results', activeStep: 3),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            const Text(
-              'Task is compleated. Your responses and scores were saved.',
-    
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: const Color(0xFFFFFFFF),
-                backgroundColor: const Color(0xFF006BA6),
+    return PopScope(
+      canPop: false, // disable back navigation
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FB),
+        appBar: const HeaderBar(title: 'Results', activeStep: 3),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              const Text(
+                'Task is compleated. Your responses and scores were saved.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
               ),
-              child: const Text('Done'),
-            ),
-          ],
+              const Spacer(),
+              ElevatedButton(
+                onPressed: () =>
+                    Navigator.of(context).popUntil((r) => r.isFirst),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: const Color(0xFFFFFFFF),
+                  backgroundColor: const Color(0xFF006BA6),
+                ),
+                child: const Text('Done'),
+              ),
+            ],
+          ),
         ),
       ),
     );
