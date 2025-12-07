@@ -25,8 +25,9 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
 
   bool speaking = false;
   bool listening = false;
+  bool ttsFinished = false;
+
   String recognized = '';
-  bool hasPlayed = false;
 
   Timer? _timer;
 
@@ -37,78 +38,70 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
     _stt.init();
   }
 
+  // ——————————————————————————
+  // PLAY FIRST 3 WORDS
+  // ——————————————————————————
   Future<void> _playWords() async {
-    await _stop();
-
     setState(() {
-      listening = false;
       speaking = true;
-      hasPlayed = true;
+      listening = false;
+      ttsFinished = false;
+
+      recognized = '';
     });
-    
-    for (final word in widget.words.take(3)) {
-      await _tts.speak(word);
+
+    for (final w in widget.words.take(3)) {
+      await _tts.speak(w);
       await Future.delayed(const Duration(seconds: 1));
     }
-    
-    setState(() => speaking = false);
+
+    setState(() {
+      speaking = false;
+      ttsFinished = true;
+    });
   }
 
+  // ——————————————————————————
+  // START LISTENING
+  // ——————————————————————————
   Future<void> _startListening() async {
-    startTimer();
     setState(() {
       listening = true;
-      speaking = false;
+      ttsFinished = false;
     });
-    _tts.dispose();
+
+    _startTimer();
 
     await _stt.startListening(
-      onPartialResult: (text) {
-        setState(() => recognized = text);
-      },
-      onFinalResult: (finalText) {
-        recognized = finalText;
-        debugPrint('🎤 Final recognized text: $finalText');
-      },
+      onPartialResult: (text) => setState(() => recognized = text),
+      onFinalResult: (text) => recognized = text,
     );
   }
 
-  Future<void> _stop() async {
+  Future<void> _stopListening() async {
     await _stt.stopListening();
-    if (mounted) setState(() => listening = false);
+    setState(() => listening = false);
   }
 
-  List<String> _splitWords(String text) {
-    return text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
+  // TIMER
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer(const Duration(seconds: 8), () {
+      if (listening) _stopListening();
+    });
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     _tts.dispose();
     _stt.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
-  void startTimer() {
-    setState(() {
-      speaking = false;
-    });
-    _timer?.cancel();
-    _timer = Timer(const Duration(seconds: 6), _onTimerComplete);
-    print('Timer started for 6 seconds...');
-  }
-
-  void _onTimerComplete() {
-    print('Timer completed. Stopping listening...');
-    if (listening) {
-      _stop();
-      setState(() {
-        speaking = false;
-      });
-    }
-  }
-
+  // ——————————————————————————
+  // BUILD UI
+  // ——————————————————————————
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,82 +121,66 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
+
             const SizedBox(height: 20),
             _micIndicator(),
             const SizedBox(height: 20),
+
             Text(
               listening
                   ? '🎤 Listening...'
-                  : recognized.isEmpty 
-                    ? 'Tap "Play" to hear the words'
-                    : 'Your recognized words:',
-              textAlign: TextAlign.center,
+                  : recognized.isEmpty
+                      ? 'Tap "Play" to hear the words'
+                      : 'Your recognized words:',
             ),
+
             const SizedBox(height: 10),
+
             if (recognized.isNotEmpty)
               Wrap(
-                alignment: WrapAlignment.center,
                 spacing: 8,
-                runSpacing: 8,
-                children: _splitWords(recognized)
-                    .map(
-                      (word) => Chip(
-                        label: Text(word),
-                        backgroundColor: Colors.blue.shade50,
-                      ),
-                    )
+                children: recognized
+                    .split(RegExp(r'\s+'))
+                    .where((w) => w.isNotEmpty)
+                    .map((w) => Chip(
+                          label: Text(w),
+                          backgroundColor: Colors.blue.shade50,
+                        ))
                     .toList(),
               ),
+
             const Spacer(),
-            
-            // Show only one button at a time
-            if (!hasPlayed && !speaking && !listening)
+
+            // Before TTS
+            if (!speaking && !listening && !ttsFinished && recognized.isEmpty)
               ElevatedButton.icon(
                 icon: const Icon(Icons.volume_up),
-                label: const Text('Play Words'),
+                label: const Text("Play Words"),
                 onPressed: _playWords,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                ),
               ),
-            
+
+            // During TTS
             if (speaking)
               ElevatedButton.icon(
                 icon: const Icon(Icons.volume_up),
-                label: const Text('Playing...'),
+                label: const Text("Playing..."),
                 onPressed: null,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                ),
               ),
-            
-            if (hasPlayed && !speaking && !listening)
+
+            // After TTS → Speak
+            if (ttsFinished && !listening && recognized.isEmpty)
               ElevatedButton.icon(
                 icon: const Icon(Icons.mic),
-                label: const Text('Speak Now'),
+                label: const Text("Speak"),
                 onPressed: _startListening,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                ),
               ),
-            
-            if (listening)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.mic),
-                label: const Text('Listening...'),
-                onPressed: null,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-              ),
-            
-            const SizedBox(height: 16),
-            if (!listening && _splitWords(recognized).isNotEmpty)
+
+            // After listening → ONLY Continue
+            if (!listening && recognized.isNotEmpty)
               PrimaryButton(
-                label: 'Continue',
+                label: "Continue",
                 onPressed: widget.onFinished,
               ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -212,22 +189,14 @@ class _WordTaskPracticeScreenState extends State<WordTaskPracticeScreen> {
 
   Widget _micIndicator() {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 300),
       width: listening ? 80 : 60,
       height: listening ? 80 : 60,
       decoration: BoxDecoration(
         color: listening ? Colors.blueAccent : Colors.grey.shade400,
         shape: BoxShape.circle,
-        boxShadow: [
-          if (listening)
-            BoxShadow(
-              color: Colors.blueAccent.withOpacity(0.4),
-              blurRadius: 20,
-              spreadRadius: 10,
-            ),
-        ],
       ),
-      child: const Icon(Icons.mic, color: Colors.white, size: 36),
+      child: const Icon(Icons.mic, color: Colors.white, size: 32),
     );
   }
 }
