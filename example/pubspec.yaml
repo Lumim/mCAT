@@ -1,4 +1,4 @@
-name: mcat_example
+name: mcat
 description: "A mcat tool app."
 publish_to: 'none'
 version: 1.0.0+1
