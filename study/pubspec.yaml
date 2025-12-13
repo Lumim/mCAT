@@ -1,0 +1,26 @@
+name: mcatstudy
+description: "A study tool app for mcat."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  mcat_package:
+    path: ../mcat_package
+  hive_flutter: ^1.1.0
+  firebase_core: ^3.15.2
+ 
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  
+
+flutter:
+  uses-material-design: true
