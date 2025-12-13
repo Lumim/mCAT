@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../services/StudySTTService.dart';
+import '../../../mcat_package/lib/src/services/StudySTTService.dart';
 
 class StudyWordTaskScreen extends StatefulWidget {
   const StudyWordTaskScreen({super.key});
