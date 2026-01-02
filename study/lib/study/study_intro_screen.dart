@@ -7,7 +7,7 @@ class StudyIntroScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Study Introduction')),
+      appBar: AppBar(title: const Text('mCAT word study')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

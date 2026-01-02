@@ -10,6 +10,8 @@ export 'src/services/connectivity_service.dart';
 export 'src/ui/screens/intro_screen.dart';
 export 'src/ui/screens/all_intro_screen.dart';
 export 'src/services/asset_provider.dart';
+export 'src/services/stt_service.dart';
+export 'src/services/tts_service.dart';
 
 // Face Task screens
 export 'src/ui/screens/face_task/face_task_intro_screen.dart';

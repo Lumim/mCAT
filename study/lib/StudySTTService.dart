@@ -1,8 +1,9 @@
-import '../mcat_package/lib/src/services/stt_service.dart';
-import 'study_data_service.dart';
+import 'package:mcat_package/src/services/stt_service.dart';
+// Use relative import for study_data_service.dart
+import 'study_data_service.dart'; // Make sure this file exists in same folder
 
 class StudySTTService {
-  final STTService _sttService = STTService();
+  final SttService _sttService = SttService();
   final StudyDataService _dataService = StudyDataService();
 
   String _currentTranscript = '';
@@ -17,9 +18,18 @@ class StudySTTService {
     required List<String> expectedWords,
     required int listIndex,
   }) async {
-    await _sttService.startListening((text) {
-      _currentTranscript = text;
-    });
+    // Store expected words if needed
+    await _sttService.startListening(
+      onPartialResult: (text) {
+        _currentTranscript = text;
+        print('Partial: $text');
+      },
+      onFinalResult: (text) {
+        _currentTranscript = text;
+        print('Final: $text');
+      },
+      durationSeconds: 20,
+    );
   }
 
   Future<void> stopListening() async {
