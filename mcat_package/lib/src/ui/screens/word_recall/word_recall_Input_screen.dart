@@ -3,6 +3,7 @@ import 'package:mcat_package/src/services/stt_service.dart';
 import 'package:mcat_package/src/services/data_service.dart';
 import '../../widgets/header_bar.dart';
 import '../../widgets/primary_button.dart';
+import '../../../services/device_data.dart';
 
 class WordRecallInputScreen extends StatefulWidget {
   /// The original list of words from the Word Task.
@@ -30,10 +31,13 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
   String recognized = '';
   List<String> recognizedWords = [];
   int score = 0;
+  String startTimestamp = '';
+  String responseTimestamp = '';
 
   @override
   void initState() {
     super.initState();
+    startTimestamp = DateTime.now().toIso8601String();
     _stt.init();
   }
 
@@ -49,6 +53,7 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
 
     setState(() {
       listening = true;
+      responseTimestamp = DateTime.now().toIso8601String();
       recognized = '';
       recognizedWords = [];
       score = 0;
@@ -83,15 +88,12 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
     if (saving) return;
     setState(() => saving = true);
 
-    // Normalize spoken words (from STT)
     final spoken = recognized
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-zæøåäöüéèáíóúñ\s]'), '')
         .split(RegExp(r'\s+'))
         .where((w) => w.isNotEmpty)
         .toList();
-
-    // Count how many target words were recalled (case-insensitive)
     score = 0;
     for (final w in widget.targetWords) {
       if (spoken.contains(w.toLowerCase())) score++;
@@ -100,12 +102,17 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
     final total = widget.targetWords.length;
 
     await DataService().saveTask('word_recall', {
-      'targetWords': widget.targetWords,
-      'recognized': recognized,
+      'stimuli': widget.targetWords,
+      'response': recognized,
       'correct': score,
       'total': total,
       'accuracy': total == 0 ? 0.0 : score / total,
       'durationSec': 20,
+      "stimuli_time": startTimestamp,
+      "stimuli_type": "oral",
+      "response_time": responseTimestamp,
+      "response_type": "oral",
+      "deviceData": {DeviceData()}
     });
 
     setState(() => saving = false);
@@ -198,7 +205,7 @@ class _WordRecallInputScreenState extends State<WordRecallInputScreen> {
         color: listening || recognized.isNotEmpty ? Colors.blue : Colors.grey,
         shape: BoxShape.circle,
         boxShadow: [
-          if (listening|| recognized.isNotEmpty)
+          if (listening || recognized.isNotEmpty)
             BoxShadow(
               color: Colors.blue.withOpacity(0.3),
               blurRadius: 20,

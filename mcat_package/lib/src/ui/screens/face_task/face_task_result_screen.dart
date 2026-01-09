@@ -60,7 +60,7 @@ class FaceTaskResultScreen extends StatelessWidget {
               const SizedBox(height: 48),
 
               // --- Green confirmation button ---
-              Container(
+              /*              Container(
                 width: double.infinity,
                 height: 48,
                 decoration: BoxDecoration(
@@ -77,7 +77,7 @@ class FaceTaskResultScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
+              ), */
 
               const Spacer(),
 

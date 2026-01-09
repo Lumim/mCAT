@@ -129,27 +129,37 @@ class _McatAppState extends State<McatApp> {
                   FaceItem(
                     'assets/images/practice/face_happy_1.png',
                     Emotion.happy,
+                    '',
                   ),
-                  FaceItem('assets/images/practice/face_sad.png', Emotion.sad),
+                  FaceItem(
+                    'assets/images/practice/face_sad.png',
+                    Emotion.sad,
+                    '',
+                  ),
                   FaceItem(
                     'assets/images/practice/face_fear.png',
                     Emotion.fear,
+                    '',
                   ),
                   FaceItem(
                     'assets/images/practice/face_neutral_1.png',
                     Emotion.neutral,
+                    '',
                   ),
                   FaceItem(
                     'assets/images/practice/face_surprise.png',
                     Emotion.surprise,
+                    '',
                   ),
                   FaceItem(
                     'assets/images/practice/face_angry.png',
                     Emotion.angry,
+                    '',
                   ),
                   FaceItem(
                     'assets/images/practice/face_disgust.png',
                     Emotion.disgust,
+                    '',
                   ),
                 ],
                 onFinished: (score, total) {
@@ -271,7 +281,14 @@ class _McatAppState extends State<McatApp> {
             return MaterialPageRoute(
               builder: (context) => OrgIntroScreen(controller: orgController),
             );
-
+          case AppRoutes.orgPractice:
+            return MaterialPageRoute(
+              builder: (context) => OrgPracticeScreen(
+                controller: orgController,
+                onNext: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.orgInstruction),
+              ),
+            );
           case AppRoutes.orgInstruction:
             return MaterialPageRoute(
               builder: (context) =>

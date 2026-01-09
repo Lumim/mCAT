@@ -27,6 +27,8 @@ class LnController extends ChangeNotifier {
   final List<LnRound> _rounds;
   int _roundIndex = 0;
 
+  var currentStimuliTime = DateTime.now();
+
   LnController(this._rounds);
 
   LnRound get current => _rounds[_roundIndex];

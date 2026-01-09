@@ -9,6 +9,7 @@ enum Emotion {
   fear,
   angry,
   disgust,
+  // fearful,
 }
 
 /// Extension adding labels, colors, and icons for each [Emotion].
@@ -19,9 +20,11 @@ extension EmotionX on Emotion {
         Emotion.happy => 'Happy',
         Emotion.neutral => 'Neutral',
         Emotion.sad => 'Sad',
+        // Emotion.fearful => 'Fear',
         Emotion.fear => 'Fear',
         Emotion.angry => 'Angry',
         Emotion.disgust => 'Disgust',
+        // TODO: Handle this case.
       };
 
   /// Color representing each emotion.

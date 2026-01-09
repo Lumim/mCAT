@@ -51,7 +51,7 @@ class WordTaskResultScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 48),
-              Container(
+              /* Container(
                 width: double.infinity,
                 height: 48,
                 decoration: BoxDecoration(
@@ -67,7 +67,7 @@ class WordTaskResultScreen extends StatelessWidget {
                         fontWeight: FontWeight.w600),
                   ),
                 ),
-              ),
+              ), */
               const Spacer(),
               PrimaryButton(label: 'Next', onPressed: onNext),
               const SizedBox(height: 16),

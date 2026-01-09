@@ -33,6 +33,7 @@ class AppRoutes {
 
   // Organizational Task
   static const orgIntro = '/org_intro';
+  static const orgPractice = '/org_practice';
   static const orgInstruction = '/org_instruction';
   static const orgPlay = '/org_play';
   static const orgInput = '/org_input';

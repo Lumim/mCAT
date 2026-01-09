@@ -45,6 +45,8 @@ export 'src/ui/screens/coding_task/coding_practice_screen.dart';
 export 'src/ui/screens/coding_task/coding_assessment_screen.dart';
 export 'src/ui/screens/coding_task/coding_real_text_screen.dart';
 // Organizational Task screens
+
+export 'src/ui/screens/organizational_task/org_practice_screen.dart';
 export 'src/ui/screens/organizational_task/org_intro_screen.dart';
 export 'src/ui/screens/organizational_task/org_instruction_screen.dart';
 export 'src/ui/screens/organizational_task/org_play_screen.dart';

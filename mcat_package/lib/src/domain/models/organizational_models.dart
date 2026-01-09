@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 
 class OrgRound {
   final List<int> numbers; // mixed
-  final List<String> letters; // mixed
+  final List<String> letters;
+
+  var stimuliElements; // mixed
 
   OrgRound({required this.numbers, required this.letters});
 
@@ -65,6 +67,14 @@ class OrgController extends ChangeNotifier {
       _index++;
       notifyListeners();
     }
+  }
+
+  void resetForPractice() {
+    // Reset any state variables needed for practice
+    _index = 0;
+    _correct = 0;
+    // You might want to set a specific practice round
+    // or create a separate practice sequence
   }
 
   void reset() {

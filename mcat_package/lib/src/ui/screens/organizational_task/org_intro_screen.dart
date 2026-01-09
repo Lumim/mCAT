@@ -16,18 +16,16 @@ class OrgIntroScreen extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-           InfoCard(
-            text:
-                'In this task, you will hear numbers and letters in random order. '
-                'Type your answer as: numbers in ascending order, then letters in alphabetical order.',
-               fontSize: 16,
-              ),
-
-            
+            InfoCard(
+              text:
+                  'In this task, you will hear numbers and letters in random order. '
+                  'Type your answer as: numbers in ascending order, then letters in alphabetical order.',
+              fontSize: 16,
+            ),
             const Spacer(),
             ElevatedButton(
               onPressed: () => Navigator.pushReplacementNamed(
-                  context, '/org_instruction',
+                  context, '/org_practice', // Changed from '/org_instruction'
                   arguments: controller),
               style: ElevatedButton.styleFrom(
                 foregroundColor: const Color(0xFFFFFFFF),

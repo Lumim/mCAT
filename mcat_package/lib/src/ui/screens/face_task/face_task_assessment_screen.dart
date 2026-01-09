@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:universal_io/io.dart'; // For device detection
 import '../../../domain/models/emotion.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/header_bar.dart';
@@ -8,7 +10,9 @@ import 'package:mcat_package/src/services/data_service.dart';
 class FaceItem {
   final String asset;
   final Emotion correct;
-  FaceItem(this.asset, this.correct);
+  final String stimuli; // Add this to match example format (e.g., "cjneut")
+
+  FaceItem(this.asset, this.correct, this.stimuli);
 }
 
 class FaceTaskAssessmentScreen extends StatefulWidget {
@@ -35,6 +39,15 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
   Timer? _timer;
   late AnimationController _progressController;
 
+  // Track timestamps for each trial
+  final Map<int, DateTime> _stimuliTimes = {};
+  final Map<int, DateTime> _responseTimes = {};
+  final Map<int, Map<String, dynamic>> _trialData = {};
+
+  // Track emotion counts
+  final Map<Emotion, int> _emotionCounts = {for (var e in Emotion.values) e: 0};
+  final Map<Emotion, int> _correctCounts = {for (var e in Emotion.values) e: 0};
+
   @override
   void initState() {
     super.initState();
@@ -50,25 +63,43 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
     _progressController.forward(from: 0);
     setState(() => showImage = true);
 
+    // Record when the stimulus was shown
+    _stimuliTimes[index] = DateTime.now();
+
     _timer = Timer(const Duration(seconds: 3), () {
       if (mounted) setState(() => showImage = false);
     });
   }
 
-  void _next() {
-    setState(() {
-      selected = null;
-      showImage = true;
-      index++;
-    });
-    _startTimer();
-  }
-
   void _selectEmotion(Emotion e) async {
     if (!showImage && selected == null) {
       selected = e;
+
+      // Record response time
+      _responseTimes[index] = DateTime.now();
+
       final current = widget.items[index];
-      if (selected == current.correct) score++;
+      final isCorrect = selected == current.correct;
+
+      // Update counts
+      _emotionCounts[current.correct] =
+          (_emotionCounts[current.correct] ?? 0) + 1;
+      if (isCorrect) {
+        score++;
+        _correctCounts[current.correct] =
+            (_correctCounts[current.correct] ?? 0) + 1;
+      }
+
+      // Store trial data
+      _trialData[index] = {
+        'correct': isCorrect,
+        'stimuli': current.stimuli, // e.g., "cjneut"
+        'response': e.toString().split('.').last, // e.g., "neut"
+        'stimuli_time': _stimuliTimes[index]?.toIso8601String(),
+        'stimuli_type': 'image',
+        'response_time': _responseTimes[index]?.toIso8601String(),
+        'response_type': 'button',
+      };
 
       // small delay to show feedback
       await Future.delayed(const Duration(milliseconds: 400));
@@ -85,12 +116,120 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
 
   Future<void> _saveResult() async {
     final total = widget.items.length;
+
+    // Calculate overview statistics
+    Map<String, dynamic> overview = {};
+    for (var emotion in Emotion.values) {
+      final emotionKey = _getEmotionKey(emotion); // Convert to example format
+      final count = _emotionCounts[emotion] ?? 0;
+      final correct = _correctCounts[emotion] ?? 0;
+      final percentageCorrect = count > 0 ? correct / count : 0.0;
+
+      overview[emotionKey] = {
+        'count': count,
+        'correct': correct,
+        'percentageCorrect': percentageCorrect,
+      };
+    }
+
+    // Format responses in example format (trial1, trial2, etc.)
+    Map<String, dynamic> responses = {};
+    for (var i = 0; i < _trialData.length; i++) {
+      final trialKey = 'trial${i + 1}';
+      responses[trialKey] = _trialData[i];
+    }
+
+    // Get device data
+    final deviceData = _getDeviceData();
+
+    // Save all data
     await DataService().saveTask('face_task', {
+      'overview': overview,
+      'responses': responses,
+      'deviceData': deviceData,
       'correct': score,
       'total': total,
       'accuracy': score / total,
-      'timeTakenSec': 3 * total, // 3 sec per face
+      'timeTakenSec': 3 * total,
+      'timestamp': DateTime.now().toIso8601String(),
     });
+  }
+
+  String _getEmotionKey(Emotion emotion) {
+    // Convert Emotion enum to the format used in example
+    switch (emotion) {
+      case Emotion.angry:
+        return 'ang';
+      case Emotion.disgust:
+        return 'dis';
+      case Emotion.happy:
+        return 'hap';
+      case Emotion.sad:
+        return 'sad';
+      case Emotion.surprise:
+        return 'sur';
+
+      case Emotion.neutral:
+        return 'neut';
+        // case Emotion.fearful:
+        //return 'fear';
+        // TODO: Handle this case.
+        // ignore: dead_code
+        throw UnimplementedError();
+      case Emotion.fear:
+        return 'fear';
+        // TODO: Handle this case.
+        // ignore: dead_code
+        throw UnimplementedError();
+    }
+  }
+
+  Map<String, dynamic> _getDeviceData() {
+    // This is a simplified version - you might want to use a package like device_info
+    return {
+      'isiPad': false, // You'd need to detect this properly
+      'isMobile': Platform.isAndroid || Platform.isIOS,
+      'osVersion': _getOSVersion(),
+      'userAgent': _getUserAgent(),
+      'isTouchDevice': true, // Assuming mobile/tablet
+      'possibleDeviceType': _getDeviceType(),
+    };
+  }
+
+  String _getOSVersion() {
+    if (Platform.isAndroid) return 'Android';
+    if (Platform.isIOS) return 'iOS';
+    if (Platform.isMacOS) return 'Mac OS X';
+    if (Platform.isWindows) return 'Windows';
+    if (Platform.isLinux) return 'Linux';
+    return 'Unknown';
+  }
+
+  String _getUserAgent() {
+    // For Flutter web, you'd use dart:html
+    // For mobile, you can use device_info package
+    return 'Flutter App';
+  }
+
+  String _getDeviceType() {
+    final size = MediaQuery.of(context).size;
+    final ratio = MediaQuery.of(context).devicePixelRatio;
+    final width = size.width * ratio;
+    final height = size.height * ratio;
+
+    if (width > 1100 || height > 1100) {
+      return 'tablet';
+    }
+    return 'mobile';
+  }
+
+  void _next() {
+    setState(() {
+      selected = null;
+      showImage = true;
+      index++;
+    });
+    _startTimer();
   }
 
   @override
@@ -105,7 +244,7 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
     final current = widget.items[index];
 
     return PopScope(
-      canPop: false, // disable back navigation
+      canPop: false,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F6FB),
         appBar: const HeaderBar(title: 'Face Task', activeStep: 1),
@@ -136,7 +275,6 @@ class _FaceTaskAssessmentScreenState extends State<FaceTaskAssessmentScreen>
                               Expanded(
                                 child: Image.asset(
                                   current.asset,
-                                  // ✅ IMPORTANT: load asset from package
                                   package: 'mcat_package',
                                   fit: BoxFit.contain,
                                 ),
