@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
-import '../routes.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
-  runApp(const MCATStudyApp());
+import './study/study_word_task_screen.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(); // now uses google-services.json
+
+  runApp(const MyApp());
 }
 
-class MCATStudyApp extends StatelessWidget {
-  const MCATStudyApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MCAT Study',
+      title: 'Word Study',
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.studyIntro,
-      routes: AppRoutes.routes,
+      home: const StudyWordTaskScreen(),
     );
   }
 }

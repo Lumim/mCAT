@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mcat_package/src/services/stt_service.dart';
 import 'package:mcat_package/src/services/tts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../study_data_service.dart';
 
 class StudyWordTaskScreen extends StatefulWidget {
   const StudyWordTaskScreen({super.key});
@@ -14,6 +15,9 @@ class StudyWordTaskScreen extends StatefulWidget {
 class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
   final SttService _sttService = SttService();
   final TtsService _ttsService = TtsService();
+  final StudyDataService _studyData = StudyDataService();
+
+  late final String _studyId;
 
   int _currentListIndex = 0;
   bool _speaking = false;
@@ -24,6 +28,7 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
   Timer? _listeningTimer;
   int _timeRemaining = 20;
 
+  // English word lists
   final List<List<String>> wordLists = [
     [
       'coffee',
@@ -62,6 +67,8 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
       'candle',
     ],
   ];
+
+  // Danish lists (currently unused but kept if you want to switch later)
   final List<List<String>> DAwordLists = [
     [
       'tromme',
@@ -100,6 +107,7 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
       'blomst',
     ],
   ];
+
   @override
   void initState() {
     super.initState();
@@ -107,8 +115,21 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
   }
 
   Future<void> _initServices() async {
+    // Unique session id so you can take the study many times
+    _studyId = 'study_word_${DateTime.now().millisecondsSinceEpoch}';
+
     await _ttsService.init();
     await _sttService.init();
+
+    // Ask for microphone permission (if not already handled globally)
+    final status = await Permission.microphone.request();
+    if (!status.isGranted) {
+      if (mounted) Navigator.pop(context);
+      return;
+    }
+
+    // Create a Firestore session doc
+    await _studyData.createStudy(_studyId);
   }
 
   // PLAY ALL WORDS SEQUENTIALLY
@@ -122,45 +143,47 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
       _recognizedText = '';
     });
 
-    for (final word in wordLists[_currentListIndex]) {
+    final currentWords = wordLists[_currentListIndex];
+
+    for (final word in currentWords) {
       await _ttsService.speak(word);
       await Future.delayed(const Duration(milliseconds: 800));
     }
 
     setState(() {
       _speaking = false;
-      _ttsFinished = true; // now user may speak
+      _ttsFinished = true; // user may now speak
     });
   }
 
   // START LISTENING
   Future<void> _startListening() async {
-    if (!_sttService.isListening) {
-      setState(() {
-        _listening = true;
-        _speaking = false;
-        _ttsFinished = false;
+    if (_sttService.isListening) return;
 
-        _recognizedText = '';
-        _timeRemaining = 20;
-      });
+    setState(() {
+      _listening = true;
+      _speaking = false;
+      _ttsFinished = false;
 
-      _startListeningTimer();
+      _recognizedText = '';
+      _timeRemaining = 20;
+    });
 
-      await _sttService.startListening(
-        onPartialResult: (text) {
-          setState(() {
-            _recognizedText = text;
-          });
-        },
-        onFinalResult: (text) {
-          setState(() {
-            _recognizedText = text;
-          });
-        },
-        durationSeconds: 20,
-      );
-    }
+    _startListeningTimer();
+
+    await _sttService.startListening(
+      onPartialResult: (text) {
+        setState(() {
+          _recognizedText = text;
+        });
+      },
+      onFinalResult: (text) {
+        setState(() {
+          _recognizedText = text;
+        });
+      },
+      durationSeconds: 20,
+    );
   }
 
   // START TIMER FOR LISTENING
@@ -183,7 +206,7 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
     });
   }
 
-  // STOP LISTENING
+  // STOP LISTENING AND SAVE
   Future<void> _stopListening() async {
     if (_sttService.isListening) {
       await _sttService.stopListening();
@@ -195,14 +218,26 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
 
     setState(() => _listening = false);
 
-    // Move to next list or finish
+    // Save this list’s result to Firestore
+    final List<String> expectedWords = wordLists[_currentListIndex];
+
+    await _studyData.saveWordListResult(
+      studyId: _studyId,
+      listIndex: _currentListIndex,
+      transcript: _recognizedText,
+      expectedWords: expectedWords,
+    );
+
+    // Keep a combined transcript if needed
+    if (_recognizedText.isNotEmpty) {
+      _finalizedText = '$_finalizedText $_recognizedText'.trim();
+    }
+
+    // Next list or finish
     if (_currentListIndex < wordLists.length - 1) {
-      _finalizedText = _finalizedText + _recognizedText;
       await Future.delayed(const Duration(milliseconds: 500));
       _moveToNextList();
     } else {
-      _finalizedText = _finalizedText + _recognizedText;
-
       await Future.delayed(const Duration(milliseconds: 500));
       await _finishStudy();
     }
@@ -213,12 +248,14 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
       _currentListIndex++;
       _ttsFinished = false;
       _recognizedText = '';
+      _timeRemaining = 20;
     });
   }
 
   Future<void> _finishStudy() async {
-    // Save results if needed
-    print(' 🔁🔁🔁!!!!!!Study completed! Final text: $_finalizedText');
+    await _studyData.completeStudy(_studyId);
+
+    debugPrint('🔁 Study completed! Final text: $_finalizedText');
 
     if (mounted) {
       Navigator.pop(context);
@@ -239,18 +276,12 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
       canPop: false,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F6FB),
-        appBar: AppBar(
-          title: const Text('Word  Study'),
-          backgroundColor: Colors.white,
-          elevation: 2,
-          centerTitle: true,
-        ),
+        appBar: AppBar(title: const Text('Word Study')),
         body: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Instruction
               const Text(
                 'Listen carefully and repeat all the words you hear.',
                 textAlign: TextAlign.center,
@@ -262,20 +293,17 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
               ),
 
               const SizedBox(height: 32),
-
-              // Progress indicator
-              Text(
+              //not showing current list of words
+              /* Text(
                 'List ${_currentListIndex + 1} of ${wordLists.length}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.blue,
                 ),
-              ),
-
+              ), */
               const SizedBox(height: 20),
 
-              // Current words display
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -302,12 +330,10 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
 
               const SizedBox(height: 40),
 
-              // Microphone indicator
               _buildMicIndicator(),
 
               const SizedBox(height: 16),
 
-              // Listening status
               if (_listening)
                 Column(
                   children: [
@@ -329,7 +355,6 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
 
               const SizedBox(height: 20),
 
-              // Recognized words chips
               if (_recognizedText.isNotEmpty)
                 Wrap(
                   alignment: WrapAlignment.center,
@@ -350,10 +375,8 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
 
               const Spacer(),
 
-              // Button controls
               Column(
                 children: [
-                  // 1. Play Words button (before TTS starts)
                   if (!_speaking &&
                       !_listening &&
                       !_ttsFinished &&
@@ -375,7 +398,6 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
                       ),
                     ),
 
-                  // 2. Playing indicator
                   if (_speaking)
                     ElevatedButton.icon(
                       onPressed: null,
@@ -394,7 +416,6 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
                       ),
                     ),
 
-                  // 3. Speak button (after TTS finishes)
                   if (_ttsFinished && !_listening)
                     ElevatedButton.icon(
                       onPressed: _startListening,
@@ -415,7 +436,6 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
 
                   const SizedBox(height: 12),
 
-                  // 4. Stop button (during listening)
                   if (_listening)
                     ElevatedButton.icon(
                       onPressed: _stopListening,
@@ -434,7 +454,6 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
                       ),
                     ),
 
-                  // 5. Next button (after listening)
                   if (!_listening &&
                       _recognizedText.isNotEmpty &&
                       _currentListIndex < wordLists.length - 1)
@@ -454,7 +473,6 @@ class _StudyWordTaskScreenState extends State<StudyWordTaskScreen> {
                       ),
                     ),
 
-                  // 6. Finish button (last list)
                   if (!_listening &&
                       _recognizedText.isNotEmpty &&
                       _currentListIndex == wordLists.length - 1)

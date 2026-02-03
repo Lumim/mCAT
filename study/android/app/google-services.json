@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "63672245201",
+    "project_id": "mcat-dtu-lummim",
+    "storage_bucket": "mcat-dtu-lummim.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63672245201:android:fb187eaa31cb0130015ef0",
+        "android_client_info": {
+          "package_name": "com.example.example"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAciG_Z7v5J32RRegrJl9FwgMCzgJ8AJ4E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
